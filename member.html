@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Konektor - KONEKTA</title>
+
+    <link rel="icon" href="logo.png" type="image/png">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <style>
+        :root { --primary: #0f766e; }
+        body { background-color: #f0fdf4; font-family: ui-sans-serif, system-ui, sans-serif; color: #111827; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .nav-active { color: #0f766e; font-weight: 900; border-top: 3px solid #0f766e; }
+        .swal2-popup { border-radius: 20px !important; }
+        .swal2-title { font-weight: 900 !important; color: var(--primary) !important; }
+    </style>
+</head>
+<body class="pb-24 min-h-screen">
+
+    <div id="tab-anggota" class="p-5 max-w-md mx-auto text-center">
+        
+        <div class="bg-gradient-to-br from-teal-600 to-emerald-800 text-white p-8 rounded-[2.5rem] shadow-2xl mb-6 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+            <p class="text-[10px] opacity-80 uppercase tracking-[0.2em] font-black text-center relative z-10">KONEKTA POIN</p>
+            <h1 id="user-points" class="text-7xl font-black mt-2 text-center relative z-10 tracking-tighter">0</h1>
+            <div class="mt-8 border-t border-white/20 pt-5 text-center relative z-10">
+                <p id="user-name" class="font-black text-xl uppercase italic tracking-wide">Memuat...</p>
+                <p id="user-id-text" class="bg-black/20 px-6 py-2 rounded-full font-mono text-xl font-bold mt-2 inline-block backdrop-blur-sm border border-white/20 shadow-md">ID: -</p>
+            </div>
+        </div>
+        
+        <div id="section-qr">
+            <div class="grid grid-cols-2 gap-3 mb-4 text-center">
+                <div class="bg-white p-4 rounded-2xl border border-green-100 shadow-sm flex flex-col items-center justify-center">
+                    <span class="text-2xl mb-1">🆔</span>
+                    <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest text-center">ID Konektor</span>
+                </div>
+                <button onclick="openScanner()" class="bg-white p-4 rounded-2xl border-2 border-dashed border-teal-500 shadow-lg active:scale-95 flex flex-col items-center justify-center group hover:bg-teal-50 transition-all">
+                    <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">📷</span>
+                    <span class="text-[9px] font-black text-teal-600 uppercase tracking-widest">Scan QR Event</span>
+                </button>
+            </div>
+
+            <div class="bg-yellow-50 p-5 rounded-[2rem] border border-yellow-200 mb-4 shadow-sm text-center relative overflow-hidden">
+                <div class="absolute -top-4 -right-4 text-6xl opacity-10 rotate-12">🏆</div>
+                <h3 class="text-xs font-black text-yellow-800 uppercase tracking-widest mb-3 border-b border-yellow-200 pb-2">Top 5 Konektor</h3>
+                <div id="leaderboard-list" class="space-y-2">
+                    <p class="text-[9px] text-gray-400 italic">Memuat data...</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-[2.5rem] shadow-sm border border-green-100 p-6 text-center">
+                <div id="qrcode-area" class="flex justify-center mb-6 p-2"></div>
+                <h4 class="text-[10px] font-black uppercase text-gray-400 mb-4 italic border-b pb-2 tracking-widest text-center">Jejak Aktivitas</h4>
+                <div id="history-list" class="space-y-2 max-h-64 overflow-y-auto hide-scrollbar">
+                    <p class="text-[9px] text-gray-400 italic">Memuat riwayat...</p>
+                </div>
+                
+                <button onclick="logout()" class="text-[9px] font-black text-red-400 mt-8 block mx-auto underline italic uppercase hover:text-red-600">Keluar Aplikasi</button>
+            </div>
+        </div>
+
+        <div id="section-redeem" class="hidden space-y-4">
+            <button onclick="loadMemberRedeemHistory()" class="w-full bg-white border border-gray-200 text-gray-600 py-3 rounded-2xl font-black uppercase text-[10px] shadow-sm active:scale-95 mb-2 hover:bg-gray-50">📦 Cek Status Penukaran Saya</button>
+            <div id="redeem-catalog" class="grid grid-cols-1 gap-3"></div>
+        </div>
+    </div>
+
+    <div id="member-nav" class="fixed bottom-6 left-6 right-6 bg-white/90 backdrop-blur-md border border-gray-200 p-2 rounded-full flex justify-around max-w-sm mx-auto z-40 shadow-2xl">
+        <button id="nav-qr" onclick="showSection('qr')" class="flex-1 py-3 rounded-full flex flex-col items-center justify-center nav-active transition-all"><span class="text-xl mb-0.5">🏠</span><span class="text-[7px] font-black uppercase tracking-widest">Home</span></button>
+        <button id="nav-redeem" onclick="showSection('redeem')" class="flex-1 py-3 rounded-full flex flex-col items-center justify-center text-gray-400 hover:text-gray-600 transition-all"><span class="text-xl mb-0.5">🎁</span><span class="text-[7px] font-black uppercase tracking-widest">Redeem</span></button>
+    </div>
+
+    <div id="scanner-modal" class="hidden fixed inset-0 bg-black/95 z-50 flex flex-col items-center justify-center p-6 text-white text-center">
+        <div class="relative w-full max-w-sm aspect-square mb-8">
+            <div id="reader" class="w-full h-full rounded-3xl overflow-hidden border-4 border-teal-500"></div>
+        </div>
+        <button onclick="closeScanner()" class="bg-white/10 border border-white/20 text-white px-8 py-3 rounded-full text-xs font-black uppercase active:scale-95">Tutup Kamera</button>
+    </div>
+
+    <div id="my-orders-modal" class="hidden fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-[2rem] w-full max-w-md max-h-[85vh] overflow-hidden flex flex-col shadow-2xl relative">
+            <div class="p-6 pb-2 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+                <h2 class="text-lg font-black text-[#0f766e] uppercase">Status Penukaran</h2>
+                <button onclick="document.getElementById('my-orders-modal').classList.add('hidden')" class="bg-gray-200 w-8 h-8 rounded-full flex items-center justify-center text-gray-500 font-bold hover:bg-red-100 hover:text-red-500 transition-all">✕</button>
+            </div>
+            <div id="my-orders-list" class="p-6 overflow-y-auto space-y-3 bg-gray-50 min-h-[200px]"></div>
+            <div class="p-4 border-t border-gray-100 bg-white text-center">
+                <p class="text-[10px] text-red-600 font-bold mb-2 uppercase">Jika penukaran belum diproses > 24 jam, hubungi Admin.</p>
+                <a href="https://wa.me/6281339760265?text=Halo%20Admin%2C%20mau%20tanya%20status%20redeem%20saya..." target="_blank" class="block w-full bg-green-50 text-green-600 font-black text-[10px] uppercase py-3 rounded-xl border border-green-100">Hubungi Admin</a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import db dari firebase-config.js
+        import { db } from './firebase-config.js';
+        
+        // Import fungsi Firestore
+        import { doc, getDoc, updateDoc, increment, collection, addDoc, query, where, orderBy, limit, getDocs, onSnapshot, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // --- PENJAGA PINTU (GATEKEEPER) ---
+        // Tendang user jika belum login atau bukan member
+        const role = localStorage.getItem('ms_role');
+        const uid = localStorage.getItem('ms_user_id');
+        
+        if (role !== 'member' || !uid) {
+            window.location.href = "index.html";
+        }
+
+        let html5QrCode = null;
+
+        // Katalog Hadiah
+        const CATALOG = [
+            { id: 'R01', name: 'Pulsa 20rb', cost: 100, type: 'Nomor HP' },
+            { id: 'R02', name: 'Beras 3kg', cost: 150, type: 'Alamat Lengkap' },
+            { id: 'R03', name: 'Paket Sembako', cost: 300, type: 'Alamat Lengkap' }
+        ];
+
+        // --- CORE FUNCTIONS ---
+
+        async function loadUserData() {
+            try {
+                const uSnap = await getDoc(doc(db, "users", uid));
+                if(uSnap.exists()) {
+                    const d = uSnap.data();
+                    document.getElementById('user-points').innerText = d.points.toLocaleString();
+                    document.getElementById('user-name').innerText = d.name;
+                    document.getElementById('user-id-text').innerText = "ID: " + uid;
+                    
+                    // Render QR Code Pribadi
+                    document.getElementById("qrcode-area").innerHTML = "";
+                    new QRCode(document.getElementById("qrcode-area"), { text: uid, width: 200, height: 200, colorDark: "#0f766e" });
+                } else { 
+                    Swal.fire("Sesi Berakhir", "Akun tidak ditemukan. Silakan login kembali.", "error").then(() => logout()); 
+                }
+            } catch (e) {
+                console.error("Gagal memuat data user:", e);
+            }
+        }
+
+        function loadHistory() {
+            const q = query(collection(db, "history"), where("userId", "==", uid));
+            onSnapshot(q, (snap) => {
+                const list = document.getElementById('history-list');
+                if(snap.empty) { 
+                    list.innerHTML = '<p class="text-[9px] text-gray-300 py-6 uppercase font-black text-center italic">Belum ada riwayat</p>'; 
+                    return; 
+                }
+                const docs = snap.docs.map(d => d.data()).sort((a,b) => (b.date?.seconds || 0) - (a.date?.seconds || 0));
+                list.innerHTML = docs.map(h => `<div class="p-4 bg-gray-50 rounded-2xl flex justify-between items-center text-[10px] font-bold uppercase border border-gray-100 mb-2"><div class="text-left"><p class="text-gray-700">${h.activity}</p><p class="text-[8px] text-gray-400 font-medium mt-0.5">${h.eventDate || 'Hari ini'}</p></div><span class="${h.points < 0 ? 'text-red-500' : 'text-teal-600'} text-xs font-black">+${h.points} P</span></div>`).join('');
+            });
+        }
+
+        async function loadLeaderboard() {
+            const list = document.getElementById('leaderboard-list');
+            try {
+                const q = query(collection(db, "users"), where("role", "==", "member"), orderBy("points", "desc"), limit(5));
+                const snap = await getDocs(q);
+                list.innerHTML = "";
+                let rank = 1;
+                snap.forEach(d => {
+                    const u = d.data();
+                    let medal = rank === 1 ? '🥇' : (rank === 2 ? '🥈' : (rank === 3 ? '🥉' : `#${rank}`));
+                    // Sensor Nama (cth: Budi -> Bud***)
+                    const maskedName = u.name.split(' ')[0].substring(0, 3) + "***";
+                    const location = u.domicile ? (u.domicile.includes(')') ? u.domicile.split(') ')[1] : u.domicile) : "Surabaya";
+                    
+                    list.innerHTML += `<div class="flex justify-between items-center border-b border-yellow-100 pb-1 mb-1 last:border-0"><div class="text-left flex items-center gap-2"><span class="font-black text-sm w-6">${medal}</span><div><p class="text-[10px] font-bold text-gray-700 uppercase leading-none">${maskedName}</p><p class="text-[8px] text-gray-400 leading-none">${location}</p></div></div><span class="text-[10px] font-black text-teal-600">${u.points} P</span></div>`;
+                    rank++;
+                });
+            } catch (e) { 
+                list.innerHTML = `<p class="text-[8px] text-red-400 italic">Gagal memuat klasemen. Database butuh Index.</p>`; 
+                console.log(e); 
+            }
+        }
+
+        function renderCatalog() { 
+            document.getElementById('redeem-catalog').innerHTML = CATALOG.map(i => `<div class="bg-white p-5 rounded-3xl flex items-center justify-between border border-gray-100 shadow-sm hover:shadow-md transition-shadow"><div><p class="font-black text-xs uppercase italic text-gray-800">${i.name}</p><p class="text-teal-600 font-bold text-[10px]">${i.cost} Poin</p></div><button onclick="processRedeem('${i.id}', ${i.cost}, '${i.name}', '${i.type}')" class="bg-gray-900 text-white text-[9px] font-black px-6 py-3 rounded-full active:scale-95 transition-transform">TUKAR</button></div>`).join(''); 
+        }
+
+        // --- SCANNER EVENT LOGIC ---
+
+        window.openScanner = () => {
+            document.getElementById('scanner-modal').classList.remove('hidden');
+            html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start({ facingMode: "environment" }, { fps: 15, qrbox: 250 }, async (txt) => {
+                await html5QrCode.stop(); 
+                document.getElementById('scanner-modal').classList.add('hidden');
+                
+                // Jika QR berisi link web (mencegah salah scan)
+                if (txt.toLowerCase().startsWith("http") || txt.toLowerCase().startsWith("www")) {
+                    Swal.fire({ title: 'Link Terdeteksi', text: 'Buka link ini?', showCancelButton: true, confirmButtonText: 'Ya' }).then(r => { if(r.isConfirmed) window.open(txt, '_blank'); });
+                    return; 
+                }
+                
+                // Proses scan event ID
+                await processMemberScan(txt);
+            });
+        };
+
+        window.closeScanner = () => { 
+            if(html5QrCode) html5QrCode.stop(); 
+            document.getElementById('scanner-modal').classList.add('hidden'); 
+        };
+
+        async function processMemberScan(eid) {
+            // Cek history lokal (device anti-spam)
+            const hist = JSON.parse(localStorage.getItem('ms_device_history') || '{}');
+            if (hist[eid]) return Swal.fire("Stop", "HP ini sudah dipakai absen untuk event ini!", "error");
+            
+            Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+            
+            try {
+                const evSnap = await getDoc(doc(db, "active_events", eid));
+                
+                if(evSnap.exists() && evSnap.data().status === 'active') {
+                    const mRef = doc(db, "users", uid);
+                    const logId = `${uid}_${eid}`;
+                    
+                    // Cek database apakah user sudah absen di event ini
+                    const logCheck = await getDoc(doc(db, "history", logId));
+                    if(logCheck.exists()) return Swal.fire("Info", "Anda sudah tercatat hadir di event ini.", "warning");
+                    
+                    const eventData = evSnap.data();
+                    const userName = document.getElementById('user-name').innerText;
+                    
+                    // Tembak Data: Update Poin User & Catat History
+                    await updateDoc(mRef, { points: increment(eventData.points), presence_count: increment(1) });
+                    await setDoc(doc(db, "history", logId), { 
+                        userId: uid, 
+                        userName: userName, 
+                        userNik: "SELF", 
+                        activityId: eid, 
+                        activity: `Hadir: ${eventData.name}`, 
+                        points: eventData.points, 
+                        date: serverTimestamp(), 
+                        eventDate: eventData.date 
+                    });
+                    
+                    // Kunci device lokal
+                    hist[eid] = true; 
+                    localStorage.setItem('ms_device_history', JSON.stringify(hist));
+                    
+                    Swal.fire({ title: 'BERHASIL!', text: `Anda mendapat +${eventData.points} Poin.`, icon: 'success', timer: 2000, showConfirmButton: false }).then(() => location.reload());
+                } else { 
+                    Swal.fire("Gagal", "QR Invalid atau Event sudah ditutup oleh GM.", "error"); 
+                }
+            } catch (e) {
+                Swal.fire("Error", "Gagal memproses QR Code.", "error");
+                console.error(e);
+            }
+        }
+
+        // --- REDEEM LOGIC ---
+
+        window.processRedeem = async (id, cost, name, type) => {
+            const uSnap = await getDoc(doc(db, "users", uid));
+            const currentPoints = uSnap.data().points;
+            
+            if(currentPoints < cost) {
+                return Swal.fire("Gagal", `Poin kurang! Anda butuh ${cost} poin. Poin Anda: ${currentPoints}`, "error");
+            }
+            
+            Swal.fire({ 
+                title: 'Tukar Poin', 
+                text: `Masukkan ${type} untuk pengiriman:`, 
+                input: 'text', 
+                showCancelButton: true, 
+                confirmButtonColor: '#0f766e',
+                confirmButtonText: 'Kirim Permintaan' 
+            }).then(async (r) => {
+                if(r.isConfirmed && r.value) {
+                    Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+                    try {
+                        await updateDoc(doc(db, "users", uid), { points: increment(-cost) });
+                        await addDoc(collection(db, "redeem_orders"), { 
+                            userId: uid, 
+                            userName: uSnap.data().name, 
+                            userWA: uSnap.data().whatsapp, 
+                            itemName: name, 
+                            targetInfo: r.value, 
+                            date: serverTimestamp(), 
+                            status: 'pending' 
+                        });
+                        Swal.fire("Berhasil", "Permintaan terkirim. Admin akan menghubungi Anda via WA.", "success").then(() => location.reload());
+                    } catch (e) {
+                        Swal.fire("Error", "Gagal melakukan penukaran.", "error");
+                    }
+                }
+            });
+        };
+
+        window.loadMemberRedeemHistory = async () => {
+            const list = document.getElementById('my-orders-list');
+            list.innerHTML = "<p class='text-center text-xs text-gray-400 mt-4'>Sedang memuat data...</p>";
+            document.getElementById('my-orders-modal').classList.remove('hidden');
+            
+            try {
+                const q = query(collection(db, "redeem_orders"), where("userId", "==", uid), orderBy("date", "desc"));
+                const snap = await getDocs(q);
+                
+                if (snap.empty) {
+                    list.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-40 text-gray-400">
+                        <span class="text-4xl mb-2">🤷‍♂️</span>
+                        <p class="font-black text-xs uppercase text-center mt-2 tracking-widest">Belum ada penukaran hadiah.</p>
+                    </div>`;
+                } else {
+                    list.innerHTML = "";
+                    snap.forEach(d => {
+                        const o = d.data();
+                        const statusColor = o.status === 'completed' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-yellow-50 text-yellow-600 border-yellow-100';
+                        const statusText = o.status === 'completed' ? 'SELESAI' : 'DIPROSES';
+                        const dateStr = o.date ? new Date(o.date.seconds*1000).toLocaleDateString() : 'Baru saja';
+                        
+                        list.innerHTML += `<div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-center"><div><p class="text-xs font-black text-gray-800">${o.itemName}</p><p class="text-[9px] text-gray-400 mt-0.5">${dateStr} • ${o.targetInfo}</p></div><span class="px-3 py-1 rounded-full text-[9px] font-black border ${statusColor}">${statusText}</span></div>`;
+                    });
+                }
+            } catch (e) {
+                list.innerHTML = `<p class="text-center text-xs text-red-400 mt-4">Gagal memuat riwayat.</p>`;
+                console.error(e);
+            }
+        };
+
+        // --- UI & NAVIGATION ---
+
+        window.showSection = (s) => {
+            document.getElementById('section-qr').classList.toggle('hidden', s !== 'qr'); 
+            document.getElementById('section-redeem').classList.toggle('hidden', s !== 'redeem');
+            
+            document.getElementById('nav-qr').className = s === 'qr' ? 'flex-1 py-3 rounded-full flex flex-col items-center justify-center nav-active transition-all' : 'flex-1 py-3 rounded-full flex flex-col items-center justify-center text-gray-400 hover:text-gray-600 transition-all';
+            document.getElementById('nav-redeem').className = s === 'redeem' ? 'flex-1 py-3 rounded-full flex flex-col items-center justify-center nav-active transition-all' : 'flex-1 py-3 rounded-full flex flex-col items-center justify-center text-gray-400 hover:text-gray-600 transition-all';
+            
+            if(s === 'redeem') renderCatalog();
+        };
+
+        window.logout = () => { 
+            Swal.fire({
+                title: 'Keluar?',
+                text: "Anda harus login pakai NIK untuk masuk lagi.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#e3342f',
+                confirmButtonText: 'Ya, Keluar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.removeItem('ms_user_id');
+                    localStorage.removeItem('ms_role');
+                    window.location.href = "index.html";
+                }
+            });
+        };
+
+        // Initialize Data
+        loadUserData();
+        loadHistory();
+        loadLeaderboard();
+
+    </script>
+</body>
+</html>

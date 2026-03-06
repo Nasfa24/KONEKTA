@@ -10,308 +10,85 @@
     <meta property="og:title" content="KONEKTA - Terhubung Lebih Dekat">
     <meta property="og:description" content="Satu Aplikasi, Ribuan Koneksi. Gabung komunitas, kumpulkan poin, dan tukarkan manfaatnya!">
     <meta property="og:image" content="https://appkonekta.fun/logo.png"> 
-    <meta property="og:image:width" content="300">
-    <meta property="og:image:height" content="300">
-
+    
     <link rel="icon" href="logo.png" type="image/png">
-    <link rel="shortcut icon" href="logo.png" type="image/png">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://unpkg.com/html5-qrcode"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
     <style>
-        :root { --primary: #0f766e; --super: #111827; }
-        .bg-primary { background-color: var(--primary); }
-        .bg-super { background-color: var(--super); }
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .nav-active { color: #0f766e; font-weight: 900; border-top: 3px solid #0f766e; }
+        :root { --primary: #0f766e; }
+        body { background-color: #f0fdf4; font-family: ui-sans-serif, system-ui, sans-serif; color: #111827; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
-        select { appearance: none; -webkit-appearance: none; }
-        .swal2-popup { font-family: ui-sans-serif, system-ui, -apple-system, sans-serif !important; border-radius: 20px !important; }
-        .swal2-title { font-weight: 900 !important; color: #0f766e !important; }
         
+        .swal2-popup { border-radius: 20px !important; }
+        .swal2-title { font-weight: 900 !important; color: var(--primary) !important; }
+        
+        /* Style Autocomplete */
         .suggestions-list {
-            position: absolute;
-            background: white;
-            border: 2px solid #e5e7eb;
-            border-top: none;
-            border-radius: 0 0 1rem 1rem;
-            width: 100%;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 50;
-            display: none;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            position: absolute; background: white; border: 2px solid #e5e7eb; border-top: none;
+            border-radius: 0 0 1rem 1rem; width: 100%; max-height: 200px; overflow-y: auto;
+            z-index: 50; display: none; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
-        .suggestion-item {
-            padding: 12px;
-            font-size: 12px;
-            font-weight: bold;
-            color: #374151;
-            cursor: pointer;
-            border-bottom: 1px solid #f3f4f6;
-        }
+        .suggestion-item { padding: 12px; font-size: 12px; font-weight: bold; color: #374151; cursor: pointer; border-bottom: 1px solid #f3f4f6; }
         .suggestion-item:hover { background-color: #f0fdf4; color: #0f766e; }
         .suggestion-item:last-child { border-bottom: none; }
     </style>
 </head>
-<body class="bg-[#f0fdf4] pb-24 min-h-screen font-sans text-gray-900">
+<body class="pb-24 min-h-screen flex items-center justify-center">
 
-    <div id="tab-awal" class="hidden p-6 max-w-md mx-auto text-center">
-        <div class="mb-10 pt-10 flex flex-col items-center">
-            <img src="https://appkonekta.fun/logo.png" alt="Logo KONEKTA" class="w-24 h-auto mb-4 object-contain drop-shadow-sm">
+    <div id="tab-awal" class="p-6 w-full max-w-md mx-auto text-center">
+        <div class="mb-10 pt-4 flex flex-col items-center">
+            <img src="https://appkonekta.fun/logo.png" alt="Logo KONEKTA" class="w-24 h-auto mb-4 object-contain drop-shadow-sm" onerror="this.style.display='none'">
             <h1 class="text-5xl font-black text-[#0f766e] tracking-tighter mb-2">KONEKTA</h1>
             <p class="text-gray-500 text-sm font-medium tracking-widest uppercase">Terhubung Lebih Dekat</p>
         </div>
 
         <div class="bg-white p-6 rounded-[2.5rem] shadow-xl border border-green-100 text-left relative z-10">
             <div class="flex bg-gray-50 rounded-full p-1 mb-6 text-center">
-                <button id="btn-auth-member" class="flex-1 py-3 rounded-full text-[11px] font-black bg-white shadow-sm text-primary uppercase tracking-wide">Konektor</button>
-                <button id="btn-auth-gm" class="flex-1 py-3 rounded-full text-[11px] font-black text-gray-400 uppercase tracking-wide">Game Master</button>
+                <button id="btn-auth-member" onclick="toggleAuth('member')" class="flex-1 py-3 rounded-full text-[11px] font-black bg-white shadow-sm text-[#0f766e] uppercase tracking-wide transition-all">Konektor</button>
+                <button id="btn-auth-gm" onclick="toggleAuth('gm')" class="flex-1 py-3 rounded-full text-[11px] font-black text-gray-400 uppercase tracking-wide transition-all">Game Master</button>
             </div>
 
             <div id="form-member">
                 <div id="member-register-fields" class="space-y-4">
-                    <input type="text" id="reg-name" placeholder="Nama Lengkap" class="w-full p-4 bg-white rounded-2xl border-2 border-gray-300 outline-none focus:border-primary transition-all font-bold text-gray-700">
-                    <input type="text" inputmode="numeric" id="reg-nik" placeholder="NIK (16 Digit)" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 16)" class="w-full p-4 bg-white rounded-2xl border-2 border-gray-300 outline-none focus:border-primary transition-all font-bold text-gray-700">
+                    <input type="text" id="reg-name" placeholder="Nama Lengkap" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none focus:border-[#0f766e] focus:bg-white transition-all font-bold text-gray-700">
+                    <input type="text" inputmode="numeric" id="reg-nik" placeholder="NIK (16 Digit)" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 16)" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none focus:border-[#0f766e] focus:bg-white transition-all font-bold text-gray-700">
                     
                     <div class="relative w-full">
-                        <input type="text" id="reg-domicile-input" placeholder="Ketik Kecamatan / Kelurahan..." autocomplete="off"
-                               class="w-full p-4 bg-white rounded-2xl border-2 border-gray-300 outline-none focus:border-primary transition-all font-bold text-gray-700 text-sm placeholder:font-normal placeholder:text-gray-400">
+                        <input type="text" id="reg-domicile-input" placeholder="Ketik Kecamatan / Kelurahan..." autocomplete="off" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none focus:border-[#0f766e] focus:bg-white transition-all font-bold text-gray-700 text-sm placeholder:font-normal placeholder:text-gray-400">
                         <div id="domicile-suggestions" class="suggestions-list"></div>
                     </div>
 
-                    <input type="text" inputmode="numeric" id="reg-wa" placeholder="No. WhatsApp" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full p-4 bg-white rounded-2xl border-2 border-gray-300 outline-none focus:border-primary transition-all font-bold text-gray-700">
-                    <input type="text" id="reg-ref" placeholder="ID Pengajak (Opsional)" class="w-full p-4 bg-white rounded-2xl border-2 border-gray-300 outline-none text-xs uppercase focus:border-primary transition-all font-bold text-gray-700">
-                    <button id="btn-daftar" class="w-full bg-gradient-to-r from-teal-600 to-emerald-600 text-white py-4 rounded-2xl font-black uppercase text-xs active:scale-95 transition-all shadow-lg mt-2 tracking-widest">Gabung Jadi Konektor</button>
-                    <button id="btn-goto-login" class="text-primary text-[10px] font-black uppercase underline mt-4 block mx-auto italic text-center">Masuk dengan NIK</button>
+                    <input type="text" inputmode="numeric" id="reg-wa" placeholder="No. WhatsApp" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none focus:border-[#0f766e] focus:bg-white transition-all font-bold text-gray-700">
+                    <button id="btn-daftar" onclick="prosesDaftar()" class="w-full bg-gradient-to-r from-teal-600 to-emerald-600 text-white py-4 rounded-2xl font-black uppercase text-xs active:scale-95 transition-all shadow-lg mt-2 tracking-widest">Gabung Jadi Konektor</button>
+                    <button onclick="toggleMemberView('login')" class="text-[#0f766e] text-[10px] font-black uppercase underline mt-4 block mx-auto italic text-center">Masuk dengan NIK</button>
                 </div>
+
                 <div id="member-login-fields" class="hidden space-y-3 text-center">
-                    <input type="text" inputmode="numeric" id="login-nik" placeholder="16 Digit NIK" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 16)" class="w-full p-5 bg-white rounded-2xl border-2 border-gray-300 focus:border-primary outline-none text-center font-black text-lg tracking-widest text-primary">
-                    <button id="btn-masuk" class="w-full bg-primary text-white py-4 rounded-2xl font-black uppercase text-xs active:scale-95 shadow-lg">Masuk Aplikasi</button>
-                    <button id="btn-goto-register" class="text-gray-400 text-[10px] font-bold uppercase mt-4 block mx-auto italic text-center">Kembali Mendaftar</button>
+                    <input type="text" inputmode="numeric" id="login-nik" placeholder="16 Digit NIK" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 16)" class="w-full p-5 bg-gray-50 rounded-2xl border-2 border-gray-200 focus:border-[#0f766e] focus:bg-white outline-none text-center font-black text-lg tracking-widest text-[#0f766e] transition-all">
+                    <button onclick="restoreByNIK()" class="w-full bg-[#0f766e] text-white py-4 rounded-2xl font-black uppercase text-xs active:scale-95 shadow-lg transition-transform">Masuk Aplikasi</button>
+                    <button onclick="toggleMemberView('register')" class="text-gray-400 text-[10px] font-bold uppercase mt-4 block mx-auto italic text-center hover:text-gray-600">Kembali Mendaftar</button>
                 </div>
             </div>
 
             <div id="form-gm" class="hidden space-y-4">
-                <input type="text" id="gm-user" placeholder="Username" class="w-full p-4 bg-white rounded-2xl border-2 border-gray-300 outline-none focus:border-primary font-bold text-gray-700">
-                <input type="password" id="gm-pass" placeholder="Password" class="w-full p-4 bg-white rounded-2xl border-2 border-gray-300 outline-none focus:border-primary font-bold text-gray-700">
-                <button id="btn-login-gm" class="w-full bg-gray-800 text-white py-4 rounded-2xl font-bold uppercase text-xs active:scale-95 shadow-lg">Login Console</button>
+                <input type="text" id="gm-user" placeholder="Username" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none focus:border-[#0f766e] focus:bg-white transition-all font-bold text-gray-700">
+                <input type="password" id="gm-pass" placeholder="Password" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none focus:border-[#0f766e] focus:bg-white transition-all font-bold text-gray-700">
+                <button onclick="loginAdmin()" class="w-full bg-gray-800 text-white py-4 rounded-2xl font-bold uppercase text-xs active:scale-95 shadow-lg transition-transform hover:bg-gray-900">Login Console</button>
             </div>
         </div>
-        <div class="mt-8 flex flex-col gap-3">
-            <button id="btn-open-guide" class="text-teal-700 font-bold text-xs uppercase tracking-widest bg-white/50 px-6 py-4 rounded-2xl border border-teal-100 hover:bg-white transition-all shadow-sm">📘 Baca Panduan Pengguna</button>
-        </div>
-    </div>
-
-    <div id="tab-anggota" class="hidden p-5 max-w-md mx-auto text-center">
-        <div class="bg-gradient-to-br from-teal-600 to-emerald-800 text-white p-8 rounded-[2.5rem] shadow-2xl mb-6 text-center relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-            <p class="text-[10px] opacity-80 uppercase tracking-[0.2em] font-black text-center relative z-10">KONEKTA POIN</p>
-            <h1 id="user-points" class="text-7xl font-black mt-2 text-center relative z-10 tracking-tighter">0</h1>
-            <div class="mt-8 border-t border-white/20 pt-5 text-center relative z-10">
-                <p id="user-name" class="font-black text-xl uppercase italic text-center tracking-wide"></p>
-                <p id="user-id-text" class="bg-black/20 px-6 py-2 rounded-full font-mono text-xl font-bold mt-2 inline-block text-center backdrop-blur-sm border border-white/20 shadow-md"></p>
-            </div>
-        </div>
-        
-        <div id="section-qr">
-            <div class="grid grid-cols-2 gap-3 mb-4 text-center">
-                <div class="bg-white p-4 rounded-2xl border border-green-100 shadow-sm flex flex-col items-center justify-center">
-                    <span class="text-2xl mb-1">🆔</span>
-                    <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest text-center">ID Konektor</span>
-                </div>
-                <button id="btn-scan-event" class="bg-white p-4 rounded-2xl border-2 border-dashed border-teal-500 shadow-lg active:scale-95 flex flex-col items-center justify-center group hover:bg-teal-50 transition-all">
-                    <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">📷</span>
-                    <span class="text-[9px] font-black text-teal-600 uppercase tracking-widest">Scan QR / Link</span>
-                </button>
-            </div>
-
-            <div class="bg-yellow-50 p-5 rounded-[2rem] border border-yellow-200 mb-4 shadow-sm text-center relative overflow-hidden">
-                <div class="absolute -top-4 -right-4 text-6xl opacity-10 rotate-12">🏆</div>
-                <h3 class="text-xs font-black text-yellow-800 uppercase tracking-widest mb-3 border-b border-yellow-200 pb-2">Top 5 Konektor</h3>
-                <div id="leaderboard-list" class="space-y-2">
-                    <p class="text-[9px] text-gray-400 italic">Memuat data...</p>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-[2.5rem] shadow-sm border border-green-100 p-6 text-center">
-                <div id="qrcode-area" class="flex justify-center mb-6 p-2"></div>
-                <h4 class="text-[10px] font-black uppercase text-gray-400 mb-4 italic border-b pb-2 tracking-widest text-center">Jejak Aktivitas</h4>
-                <div id="history-list" class="space-y-2 max-h-64 overflow-y-auto hide-scrollbar"></div>
-                <button id="btn-logout-member" class="text-[9px] font-black text-red-400 mt-8 block mx-auto underline italic uppercase">Keluar Aplikasi</button>
-            </div>
-        </div>
-
-        <div id="section-redeem" class="hidden space-y-4">
-            <button id="btn-my-orders" class="w-full bg-white border border-gray-200 text-gray-600 py-3 rounded-2xl font-black uppercase text-[10px] shadow-sm active:scale-95 mb-2">📦 Cek Status Penukaran Saya</button>
-            <div id="redeem-catalog" class="grid grid-cols-1 gap-3"></div>
-        </div>
-    </div>
-
-    <div id="tab-gm" class="hidden p-5 max-w-md mx-auto text-center">
-        <div class="flex justify-between items-center mb-6 px-2">
-            <div class="flex items-center gap-3">
-                <img src="https://appkonekta.fun/logo.png" alt="Logo" class="w-12 h-auto object-contain">
-                <div>
-                    <h2 class="text-2xl font-black uppercase text-[#0f766e] tracking-tighter text-left">KONEKTA</h2>
-                    <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest text-left">Console Admin</p>
-                </div>
-            </div>
-            <button id="btn-logout-gm" class="bg-red-50 text-red-500 px-4 py-2 rounded-full text-[10px] font-black uppercase hover:bg-red-100 transition-colors">Keluar</button>
-        </div>
-
-        <div id="super-stats" class="hidden grid grid-cols-1 mb-6 text-center">
-            <div class="bg-super text-white p-6 rounded-[2rem] shadow-xl relative overflow-hidden">
-                <p class="text-[10px] font-black uppercase tracking-[0.2em] opacity-60 text-center mb-2">Total Populasi</p>
-                <h3 id="total-members" class="text-5xl font-black mt-1 text-center tracking-tighter">0</h3>
-                <p class="text-[10px] opacity-40 uppercase mt-1">Konektor Terdaftar</p>
-                <div class="flex gap-2 mt-6">
-                    <button id="btn-view-regions" class="flex-1 bg-teal-800 text-white py-3 rounded-xl text-[10px] font-black uppercase active:scale-95 hover:bg-teal-900 transition-all border border-teal-700">Lihat Wilayah</button>
-                    <button id="btn-export-csv" class="flex-1 bg-white/10 border border-white/10 text-white py-3 rounded-xl text-[10px] font-black uppercase active:scale-95 hover:bg-white/20 transition-all">Download User .CSV</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="flex bg-white rounded-full p-1.5 mb-6 shadow-sm border border-green-50 text-center">
-            <button id="nav-gm-event" class="flex-1 py-3 rounded-full text-[10px] font-black bg-primary text-white uppercase text-center tracking-wide">Event Manager</button>
-            <button id="nav-gm-orders" class="flex-1 py-3 rounded-full text-[10px] font-black text-gray-400 uppercase text-center tracking-wide">Redeem</button>
-        </div>
-
-        <div id="gm-section-event">
-            <div id="gm-event-selector" class="mb-6 space-y-4">
-                <h3 class="text-[10px] font-black uppercase text-gray-400 tracking-widest text-center border-b border-gray-100 pb-2">Lokasi Aktif Hari Ini</h3>
-                <div id="active-locations-list" class="space-y-3"></div>
-                <button id="btn-view-archive" class="hidden w-full py-4 bg-gray-100 border border-gray-200 rounded-3xl text-[10px] font-black text-gray-500 uppercase active:scale-95 transition-all text-center shadow-sm hover:bg-gray-200 mt-2">📂 Arsip Event Selesai</button>
-                <button id="btn-show-create" class="w-full py-5 bg-white border-2 border-dashed border-teal-200 rounded-3xl text-[11px] font-black text-teal-600 uppercase active:scale-95 transition-all text-center shadow-sm hover:bg-teal-50 group mt-3">
-                    <span class="group-hover:scale-110 inline-block transition-transform mr-1">+</span> Buat Event Baru
-                </button>
-            </div>
-
-            <div id="gm-archive-list" class="hidden mb-6 space-y-4">
-                <div class="flex justify-between items-center border-b border-gray-100 pb-2">
-                    <h3 class="text-[10px] font-black uppercase text-gray-400 tracking-widest">Riwayat Event (Selesai)</h3>
-                    <button onclick="closeArchive()" class="text-xs font-bold text-red-500">Tutup</button>
-                </div>
-                <div id="archive-items" class="space-y-3"></div>
-            </div>
-
-            <div id="gm-create-event" class="hidden bg-white p-8 rounded-[3rem] shadow-2xl border border-green-100 space-y-4 relative">
-                <button id="btn-cancel-event" class="absolute top-6 right-6 text-gray-300 hover:text-red-500 font-bold text-xl">×</button>
-                <h3 class="text-center font-black uppercase text-lg text-gray-800 tracking-tight mb-4">Setup Lokasi</h3>
-                <input type="text" id="ev-name" placeholder="Nama Kegiatan" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-green-100 outline-none font-bold text-sm focus:border-primary transition-all">
-                <div class="w-full text-left ml-2 mb-1 mt-2"><label class="text-[9px] font-black text-teal-600 uppercase tracking-widest">Tanggal Pelaksanaan</label></div>
-                <input type="date" id="ev-date" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-green-100 outline-none font-bold text-gray-700 text-center focus:border-primary transition-all cursor-pointer">
-                <input type="text" id="ev-loc" placeholder="Lokasi (Contoh: Zona A)" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-green-100 outline-none font-bold text-sm focus:border-primary transition-all">
-                <input type="text" id="ev-creator" placeholder="Nama Penanggung Jawab (Wajib)" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-green-100 outline-none font-bold text-sm focus:border-primary transition-all text-teal-700 mt-2">
-                <input type="text" inputmode="numeric" id="ev-wa" placeholder="No. WhatsApp Penanggung Jawab (Wajib)" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-green-100 outline-none font-bold text-sm focus:border-primary transition-all text-teal-700 mt-2">
-                <div class="grid grid-cols-2 gap-2">
-                    <select id="ev-points" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-green-100 outline-none font-black text-primary text-center text-xs">
-                        <option value="5">5 Poin</option><option value="10" selected>10 Poin</option><option value="20">20 Poin</option>
-                    </select>
-                    <select id="ev-cooldown" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-red-100 outline-none font-black text-red-500 text-center text-xs">
-                        <option value="15">Jeda 15 Mnt</option>
-                        <option value="30">Jeda 30 Mnt</option>
-                        <option value="60" selected>Jeda 60 Mnt</option>
-                    </select>
-                </div>
-                <button id="btn-submit-event" class="w-full bg-gradient-to-r from-teal-600 to-emerald-600 text-white py-5 rounded-2xl font-black shadow-lg uppercase text-xs active:scale-95 text-center tracking-widest mt-2">AKTIFKAN SEKARANG</button>
-                <p class="text-[8px] text-gray-400 text-center font-bold mt-2 italic">*Event akan otomatis ditutup dalam 3 jam.</p>
-            </div>
-
-            <div id="gm-active-display" class="hidden bg-white p-8 rounded-[3rem] shadow-2xl border-4 border-teal-500 text-center relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-2 bg-teal-500 animate-pulse"></div>
-                <h2 id="display-ev-name" class="text-3xl font-black italic text-gray-800 uppercase leading-tight text-center mb-1"></h2>
-                <p id="display-ev-info" class="text-[10px] font-bold text-teal-600 mt-1 uppercase tracking-widest text-center bg-teal-50 inline-block px-3 py-1 rounded-full"></p>
-                <p id="display-ev-creator" class="text-[9px] text-gray-400 mt-2 font-black uppercase tracking-widest"></p>
-                <div class="my-8 flex justify-center p-4 bg-white rounded-[2rem] shadow-inner border border-gray-100"><div id="ev-qrcode-area"></div></div>
-                <p class="text-[10px] text-gray-400 mb-4 italic font-bold">Konektor Scan QR di atas, ATAU</p>
-                <button id="btn-gm-scan-member" class="w-full bg-gray-900 text-white py-4 rounded-2xl font-black uppercase shadow-lg mb-2 flex justify-center items-center gap-3 active:scale-95 hover:bg-gray-800 transition-colors">
-                    <span class="text-xl">📷</span> <span class="text-[10px] tracking-widest">Scan QR Konektor</span>
-                </button>
-                <button id="btn-view-attendees" class="w-full bg-teal-50 text-teal-700 border border-teal-100 py-3 rounded-2xl font-black uppercase shadow-sm mb-4 flex justify-center items-center gap-2 active:scale-95 hover:bg-teal-100 transition-colors">
-                    <span class="text-lg">👥</span> <span class="text-[10px] tracking-widest">Lihat Data Peserta</span>
-                </button>
-                <div class="flex gap-2">
-                    <button id="btn-close-view" class="flex-1 bg-gray-100 py-3 rounded-xl text-[9px] font-black uppercase active:scale-95 text-gray-500 hover:bg-gray-200">Kembali</button>
-                    <button id="btn-end-event" class="flex-1 bg-red-50 text-red-500 py-3 rounded-xl text-[9px] font-black uppercase active:scale-95 hover:bg-red-100">Event Selesai</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="gm-section-orders" class="hidden space-y-4">
-            <div id="gm-order-list" class="space-y-4 text-center"></div>
-        </div>
-    </div>
-
-    <div id="attendee-modal" class="hidden fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-[2rem] w-full max-w-md max-h-[85vh] overflow-hidden flex flex-col shadow-2xl relative">
-            <div class="p-6 pb-2 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
-                <div><h2 class="text-lg font-black text-[#0f766e] uppercase">Data Kehadiran</h2><p id="attendee-count" class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">0 Peserta</p></div>
-                <button id="btn-close-attendee" class="bg-gray-200 w-8 h-8 rounded-full flex items-center justify-center text-gray-500 font-bold hover:bg-red-100 hover:text-red-500 transition-all">✕</button>
-            </div>
-            <div class="p-0 overflow-y-auto flex-1 bg-white">
-                <table class="w-full text-left">
-                    <thead class="bg-teal-50 text-teal-800 text-[9px] uppercase font-black tracking-wider sticky top-0"><tr><th class="p-4 border-b border-teal-100">Nama / NIK</th><th class="p-4 border-b border-teal-100 text-right">Waktu</th></tr></thead>
-                    <tbody id="attendee-list-body" class="text-xs font-bold text-gray-600"></tbody>
-                </table>
-            </div>
-            <div class="p-4 border-t border-gray-100 bg-gray-50"><button id="btn-download-attendee-csv" class="w-full bg-green-600 text-white py-3 rounded-xl font-black text-xs uppercase shadow-lg active:scale-95 hover:bg-green-700 flex justify-center items-center gap-2">📥 Download Laporan .CSV</button></div>
-        </div>
-    </div>
-
-    <div id="my-orders-modal" class="hidden fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-[2rem] w-full max-w-md max-h-[85vh] overflow-hidden flex flex-col shadow-2xl relative">
-            <div class="p-6 pb-2 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
-                <h2 class="text-lg font-black text-[#0f766e] uppercase">Status Penukaran</h2>
-                <button onclick="document.getElementById('my-orders-modal').classList.add('hidden')" class="bg-gray-200 w-8 h-8 rounded-full flex items-center justify-center text-gray-500 font-bold hover:bg-red-100 hover:text-red-500 transition-all">✕</button>
-            </div>
-            <div id="my-orders-list" class="p-6 overflow-y-auto space-y-3 bg-gray-50 min-h-[200px]"></div>
-            <div class="p-4 border-t border-gray-100 bg-white text-center">
-                <p class="text-[10px] text-red-600 font-bold mb-2 uppercase">Jika penukaran belum diproses > 24 jam, hubungi Admin.</p>
-                <a href="https://wa.me/6281339760265?text=Halo%20SuperGM%2C%20mau%20tanya%20status%20redeem%20saya..." target="_blank" class="block w-full bg-green-50 text-green-600 font-black text-[10px] uppercase py-3 rounded-xl border border-green-100">Hubungi SuperGM</a>
-            </div>
-        </div>
-    </div>
-
-    <div id="guide-modal" class="hidden fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"><div class="bg-white rounded-[2rem] w-full max-w-md max-h-[85vh] overflow-hidden flex flex-col shadow-2xl relative"><button id="btn-close-guide" class="absolute top-4 right-4 bg-gray-100 w-10 h-10 rounded-full flex items-center justify-center text-gray-500 hover:bg-red-100 hover:text-red-500 font-bold transition-all z-10">✕</button><div class="p-6 overflow-y-auto"><h3 class="font-black text-gray-800 text-lg mb-4 text-center uppercase tracking-tight">Panduan Pengguna</h3><div class="space-y-6 text-left"><div class="bg-teal-50 p-4 rounded-2xl border border-teal-100"><h4 class="font-black text-teal-700 uppercase mb-2 text-xs tracking-widest">👤 Untuk Konektor (Member)</h4><ul class="list-disc pl-4 text-[11px] text-gray-600 space-y-1 font-bold leading-relaxed"><li><b>Daftar:</b> Isi data diri. Domisili akan muncul otomatis saat diketik.</li><li><b>Absen:</b> Scan QR saat event berlangsung.</li><li><b>Poin:</b> Kumpulkan poin dan tukarkan hadiah di menu Redeem.</li></ul></div><div class="bg-gray-50 p-4 rounded-2xl border border-gray-100"><h4 class="font-black text-gray-800 uppercase mb-2 text-xs tracking-widest">🛡️ Untuk Game Master (GM)</h4><ul class="list-disc pl-4 text-[11px] text-gray-600 space-y-1 font-bold leading-relaxed"><li><b>Buat Event:</b> Tentukan Durasi Jeda (Cooldown) agar tidak spam. Event otomatis tutup dalam 3 jam.</li><li><b>Redeem:</b> Cek validasi via WA, lalu klik SELESAI jika barang sudah dikirim.</li></ul></div></div><p class="text-[9px] text-gray-400 text-center mt-6 italic">Versi Aplikasi: 2.0 (QUBE)</p></div></div></div>
-    <div id="scanner-modal" class="hidden fixed inset-0 bg-black/95 z-50 flex flex-col items-center justify-center p-6 text-white text-center"><div class="relative w-full max-w-sm aspect-square mb-8"><div id="reader" class="w-full h-full rounded-3xl overflow-hidden border-4 border-teal-500"></div></div><button id="btn-close-scanner" class="bg-white/10 border border-white/20 text-white px-8 py-3 rounded-full text-xs font-black uppercase">Tutup Kamera</button></div>
-    <div id="region-stats-modal" class="hidden fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"><div class="bg-white rounded-[2rem] w-full max-w-md max-h-[85vh] overflow-hidden flex flex-col shadow-2xl relative"><div class="p-6 pb-2 bg-gray-50 border-b border-gray-200 flex justify-between items-center"><div><h2 class="text-lg font-black text-[#0f766e] uppercase">Statistik Wilayah</h2><p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Sebaran Konektor</p></div><button id="btn-close-regions" class="bg-gray-200 w-8 h-8 rounded-full flex items-center justify-center text-gray-500 font-bold hover:bg-red-100 hover:text-red-500 transition-all">✕</button></div><div class="p-0 overflow-y-auto flex-1"><table class="w-full text-left"><thead class="bg-teal-50 text-teal-800 text-[9px] uppercase font-black tracking-wider sticky top-0"><tr><th class="p-4 border-b border-teal-100">Kecamatan / Kelurahan</th><th class="p-4 border-b border-teal-100 text-center">Total</th></tr></thead><tbody id="region-table-body" class="text-xs font-bold text-gray-600"></tbody></table></div></div></div>
-
-    <div id="member-nav" class="hidden fixed bottom-6 left-6 right-6 bg-white/90 backdrop-blur-md border border-gray-200 p-2 rounded-full flex justify-around max-w-sm mx-auto z-40 shadow-2xl">
-        <button id="nav-qr" class="flex-1 py-3 rounded-full flex flex-col items-center justify-center nav-active transition-all"><span class="text-xl mb-0.5">🏠</span><span class="text-[7px] font-black uppercase tracking-widest">Home</span></button>
-        <button id="nav-redeem" class="flex-1 py-3 rounded-full flex flex-col items-center justify-center text-gray-400 hover:text-gray-600 transition-all"><span class="text-xl mb-0.5">🎁</span><span class="text-[7px] font-black uppercase tracking-widest">Redeem</span></button>
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, getDoc, updateDoc, increment, setDoc, collection, addDoc, query, where, orderBy, limit, getDocs, onSnapshot, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        // Import db dari firebase-config.js
+        import { db } from './firebase-config.js';
+        
+        // Import fungsi Firestore
+        import { doc, setDoc, collection, query, where, getDocs, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyA2nV-dKXEl-5ui0WQienkFiQ-XfugDzPE",
-            authDomain: "matur-suwon.firebaseapp.com",
-            projectId: "matur-suwon",
-            storageBucket: "matur-suwon.firebasestorage.app",
-            messagingSenderId: "293712183178",
-            appId: "1:293712183178:web:c9a8ab1e96e1fd68a91273"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        let html5QrCode = null;
-        let currentSelectedEventId = null;
-        let isGmScanning = false;
-        let currentAttendeeData = []; 
-
-        const CATALOG = [
-            { id: 'R01', name: 'Pulsa 20rb', cost: 100, type: 'Nomor HP' },
-            { id: 'R02', name: 'Beras 3kg', cost: 150, type: 'Alamat Lengkap' },
-            { id: 'R03', name: 'Paket Sembako', cost: 300, type: 'Alamat Lengkap' }
-        ];
-
+        // Data Lokasi
         const SURABAYA_LOCATIONS = [
             "(Asemrowo) Asemrowo", "(Asemrowo) Genting Kalianak", "(Asemrowo) Tambak Sarioso",
             "(Benowo) Kandangan", "(Benowo) Romokalisari", "(Benowo) Sememi", "(Benowo) Tambak Oso Wilangon",
@@ -347,6 +124,7 @@
             "LUAR SURABAYA"
         ];
 
+        // Autocomplete Logic
         function setupAutocomplete() {
             const input = document.getElementById('reg-domicile-input');
             const suggestionsBox = document.getElementById('domicile-suggestions');
@@ -380,439 +158,127 @@
             });
         }
 
-        function setupListeners() {
-            document.getElementById('btn-auth-member').onclick = () => toggleAuth('member');
-            document.getElementById('btn-auth-gm').onclick = () => toggleAuth('gm');
-            document.getElementById('btn-goto-login').onclick = () => toggleMemberView('login');
-            document.getElementById('btn-goto-register').onclick = () => toggleMemberView('register');
-            document.getElementById('btn-daftar').onclick = prosesDaftar;
-            document.getElementById('btn-masuk').onclick = restoreByNIK;
-            document.getElementById('btn-login-gm').onclick = loginAdmin;
-            document.getElementById('btn-logout-member').onclick = logout;
-            document.getElementById('btn-logout-gm').onclick = logout;
-            
-            document.getElementById('btn-show-create').onclick = toggleEventForm;
-            document.getElementById('btn-cancel-event').onclick = toggleEventForm;
-            document.getElementById('btn-submit-event').onclick = createEvent;
-            document.getElementById('btn-close-view').onclick = closeEventView;
-            document.getElementById('btn-end-event').onclick = endEvent;
-            document.getElementById('btn-export-csv').onclick = exportDataCSV;
-            document.getElementById('btn-gm-scan-member').onclick = openGMScannerMode;
-
-            document.getElementById('nav-gm-event').onclick = () => showGMSection('event');
-            document.getElementById('nav-gm-orders').onclick = () => showGMSection('orders');
-            document.getElementById('nav-qr').onclick = () => showSection('qr');
-            document.getElementById('nav-redeem').onclick = () => showSection('redeem');
-            document.getElementById('btn-scan-event').onclick = openMemberScannerMode;
-            document.getElementById('btn-close-scanner').onclick = closeScanner;
-            document.getElementById('btn-open-guide').onclick = openGuide;
-            document.getElementById('btn-close-guide').onclick = closeGuide;
-            document.getElementById('btn-view-regions').onclick = openRegionStats;
-            document.getElementById('btn-close-regions').onclick = closeRegionStats;
-            document.getElementById('btn-view-attendees').onclick = openAttendeeList;
-            document.getElementById('btn-close-attendee').onclick = closeAttendeeList;
-            document.getElementById('btn-download-attendee-csv').onclick = downloadAttendeeCSV;
-            document.getElementById('btn-view-archive').onclick = loadEventHistory;
-            document.getElementById('btn-my-orders').onclick = loadMemberRedeemHistory;
-
-            setupAutocomplete(); 
-        }
-
-        window.openGuide = () => { document.getElementById('guide-modal').classList.remove('hidden'); }
-        window.closeGuide = () => { document.getElementById('guide-modal').classList.add('hidden'); }
-        window.closeRegionStats = () => { document.getElementById('region-stats-modal').classList.add('hidden'); };
-        window.closeArchive = () => { document.getElementById('gm-archive-list').classList.add('hidden'); document.getElementById('active-locations-list').classList.remove('hidden'); };
-        window.closeAttendeeList = () => { document.getElementById('attendee-modal').classList.add('hidden'); };
-        window.closeScanner = () => { if(html5QrCode) html5QrCode.stop(); document.getElementById('scanner-modal').classList.add('hidden'); };
-
-        window.openRegionStats = async () => {
-            const btn = document.getElementById('btn-view-regions');
-            const originalText = btn.innerText; btn.innerText = "Memuat...";
-            try {
-                const snap = await getDocs(collection(db, "users"));
-                const regionCounts = {};
-                snap.forEach(doc => { const d = doc.data(); const dom = d.domicile || "Tidak Diketahui"; regionCounts[dom] = (regionCounts[dom] || 0) + 1; });
-                const sortedRegions = Object.entries(regionCounts).sort(([, a], [, b]) => b - a);
-                const tbody = document.getElementById('region-table-body'); tbody.innerHTML = "";
-                sortedRegions.forEach(([region, count], index) => {
-                    const isTop = index < 3 ? 'bg-yellow-50 text-yellow-800' : 'even:bg-gray-50';
-                    const rankIcon = index === 0 ? '🥇 ' : (index === 1 ? '🥈 ' : (index === 2 ? '🥉 ' : ''));
-                    tbody.innerHTML += `<tr class="${isTop} border-b border-gray-100 last:border-0 hover:bg-gray-100"><td class="p-4">${rankIcon}${region}</td><td class="p-4 text-center font-black">${count}</td></tr>`;
-                });
-                document.getElementById('region-stats-modal').classList.remove('hidden');
-            } catch (error) { Swal.fire("Error", error.message, "error"); } finally { btn.innerText = originalText; }
-        };
-
-        window.loadEventHistory = async () => {
-            const list = document.getElementById('archive-items'); list.innerHTML = "<p class='text-center py-4 text-[10px] text-gray-400'>Memuat data...</p>";
-            document.getElementById('gm-archive-list').classList.remove('hidden'); document.getElementById('active-locations-list').classList.add('hidden');
-            const q = query(collection(db, "active_events"), where("status", "==", "ended"), limit(20));
-            const snap = await getDocs(q);
-            list.innerHTML = snap.empty ? '<p class="text-center py-4 text-[10px] text-gray-400 italic">Belum ada event selesai.</p>' : '';
-            snap.forEach(d => {
-                const ev = d.data();
-                let auditBtn = ev.creatorWA ? `<a href="https://wa.me/${ev.creatorWA}?text=Audit%20Event%20${encodeURIComponent(ev.name)}" target="_blank" class="block text-center mt-2 text-[8px] font-black text-red-500 uppercase hover:underline">👮 Audit WA</a>` : '';
-                list.innerHTML += `<div class="w-full bg-gray-50 p-4 rounded-2xl border border-gray-200 mb-2"><div class="flex justify-between items-center cursor-pointer" onclick="selectLocation('${ev.id}')"><div class="text-left"><p class="text-[10px] font-black text-gray-600 line-through decoration-red-500">${ev.name}</p><p class="text-[8px] text-gray-400">${ev.date} • ${ev.location}</p><p class="text-[8px] font-bold text-teal-600">Penanggung Jawab: ${ev.creator || 'GM'}</p></div><span class="text-[9px] font-bold text-red-400 border border-red-200 px-2 py-1 rounded-lg">SELESAI</span></div>${auditBtn}</div>`;
-            });
-        };
-
-        window.openAttendeeList = async () => {
-            const btn = document.getElementById('btn-view-attendees'); btn.innerText = "Memuat Data...";
-            const tbody = document.getElementById('attendee-list-body'); tbody.innerHTML = ""; currentAttendeeData = [];
-            try {
-                const q = query(collection(db, "history"), where("activityId", "==", currentSelectedEventId));
-                const snap = await getDocs(q);
-                document.getElementById('attendee-count').innerText = `${snap.size} Peserta`;
-                if (snap.empty) { tbody.innerHTML = `<tr><td colspan="2" class="p-6 text-center text-gray-400 italic">Belum ada yang absen.</td></tr>`; } 
-                else {
-                    currentAttendeeData = snap.docs.map(d => ({ name: d.data().userName || "N/A", nik: d.data().userNik || "N/A", fullTime: new Date(d.data().date.seconds*1000).toLocaleString() }));
-                    currentAttendeeData.forEach(p => { tbody.innerHTML += `<tr class="border-b border-gray-100 hover:bg-gray-50"><td class="p-4"><div class="font-black text-teal-800 uppercase">${p.name}</div><div class="text-[9px] text-gray-400 font-mono">${p.nik}</div></td><td class="p-4 text-right text-gray-500 font-medium">${p.fullTime.split(',')[1]}</td></tr>`; });
-                }
-                document.getElementById('attendee-modal').classList.remove('hidden');
-            } catch (e) { Swal.fire("Error", e.message, "error"); } finally { btn.innerHTML = `<span class="text-lg">👥</span> <span class="text-[10px] tracking-widest">Lihat Data Peserta</span>`; }
-        };
-
-        window.downloadAttendeeCSV = () => {
-            if (currentAttendeeData.length === 0) return Swal.fire("Info", "Data kosong!", "info");
-            let csv = "Nama Lengkap,NIK / ID,Waktu Absen\n"; currentAttendeeData.forEach(row => { csv += `"${row.name}","'${row.nik}",${row.fullTime}\n`; });
-            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
-            a.download = `Laporan_Hadir_${document.getElementById('display-ev-name').innerText.replace(/\s+/g, '_')}.csv`; a.click();
-        };
-
+        // Global Window Functions untuk onClick
         window.toggleAuth = (t) => {
             document.getElementById('form-member').classList.toggle('hidden', t !== 'member');
             document.getElementById('form-gm').classList.toggle('hidden', t !== 'gm');
-            document.getElementById('btn-auth-member').className = t === 'member' ? "flex-1 py-3 rounded-full text-[11px] font-black bg-white shadow-sm text-primary uppercase tracking-wide" : "flex-1 py-3 rounded-full text-[11px] font-black text-gray-400 uppercase tracking-wide";
-            document.getElementById('btn-auth-gm').className = t === 'gm' ? "flex-1 py-3 rounded-full text-[11px] font-black bg-white shadow-sm text-primary uppercase tracking-wide" : "flex-1 py-3 rounded-full text-[11px] font-black text-gray-400 uppercase tracking-wide";
-        };
-        window.toggleMemberView = (m) => { document.getElementById('member-register-fields').classList.toggle('hidden', m === 'login'); document.getElementById('member-login-fields').classList.toggle('hidden', m !== 'login'); };
-        window.showGMSection = (s) => {
-            document.getElementById('gm-section-event').classList.toggle('hidden', s !== 'event');
-            document.getElementById('gm-section-orders').classList.toggle('hidden', s !== 'orders');
-            document.getElementById('nav-gm-event').className = s === 'event' ? "flex-1 py-3 rounded-full text-[10px] font-black bg-primary text-white uppercase" : "flex-1 py-3 rounded-full text-[10px] font-black text-gray-400 uppercase";
-            document.getElementById('nav-gm-orders').className = s === 'orders' ? "flex-1 py-3 rounded-full text-[10px] font-black bg-primary text-white uppercase" : "flex-1 py-3 rounded-full text-[10px] font-black text-gray-400 uppercase";
-            if(s === 'orders') loadRedeemOrders();
-        };
-        window.showSection = (s) => {
-            document.getElementById('section-qr').classList.toggle('hidden', s !== 'qr'); document.getElementById('section-redeem').classList.toggle('hidden', s !== 'redeem');
-            document.getElementById('nav-qr').className = s === 'qr' ? 'flex-1 py-3 rounded-full flex flex-col items-center justify-center nav-active' : 'flex-1 py-3 rounded-full flex flex-col items-center justify-center text-gray-400';
-            document.getElementById('nav-redeem').className = s === 'redeem' ? 'flex-1 py-3 rounded-full flex flex-col items-center justify-center nav-active' : 'flex-1 py-3 rounded-full flex flex-col items-center justify-center text-gray-400';
-            if(s === 'redeem') renderCatalog();
-        };
-        window.toggleEventForm = () => { document.getElementById('gm-event-selector').classList.toggle('hidden'); document.getElementById('gm-create-event').classList.toggle('hidden'); };
-
-        window.createEvent = async () => {
-            const btn = document.getElementById('btn-submit-event');
-            const creatorWA = document.getElementById('ev-wa').value.replace(/\D/g, '');
-            const cooldownMins = parseInt(document.getElementById('ev-cooldown').value);
             
-            if(!document.getElementById('ev-name').value || !document.getElementById('ev-date').value || !document.getElementById('ev-loc').value || !document.getElementById('ev-creator').value) {
-                return Swal.fire("Data Kurang", "Lengkapi semua data!", "warning");
-            }
-            if(creatorWA.length < 10) return Swal.fire("WA Invalid", "Nomor WA minimal 10 digit!", "warning");
-
-            const lastCreated = localStorage.getItem('gm_last_created_time');
-            if (lastCreated) {
-                const elapsed = Date.now() - parseInt(lastCreated);
-                const remaining = (cooldownMins * 60000) - elapsed;
-                if (remaining > 0) {
-                    const minsLeft = Math.ceil(remaining / 60000);
-                    return Swal.fire("Tunggu Dulu!", `Anda baru saja membuat event. Mohon tunggu ${minsLeft} menit lagi untuk mencegah spam.`, "error");
-                }
-            }
-
-            btn.innerText = "Memproses...";
-            const eventId = "EVT" + Date.now();
+            const btnMember = document.getElementById('btn-auth-member');
+            const btnGm = document.getElementById('btn-auth-gm');
             
-            try {
-                await setDoc(doc(db, "active_events", eventId), { 
-                    name: document.getElementById('ev-name').value, 
-                    date: document.getElementById('ev-date').value, 
-                    location: document.getElementById('ev-loc').value, 
-                    creator: document.getElementById('ev-creator').value, 
-                    creatorWA: creatorWA.startsWith('0') ? '62' + creatorWA.slice(1) : creatorWA, 
-                    points: parseInt(document.getElementById('ev-points').value), 
-                    status: 'active', 
-                    id: eventId,
-                    createdAt: Date.now()
-                });
-                
-                localStorage.setItem('gm_last_created_time', Date.now().toString());
-                
-                Swal.fire("Sukses", "Event Berhasil Dibuat! \n(Otomatis tutup dalam 3 jam)", "success").then(() => location.reload());
-            } catch (e) { Swal.fire("Error", e.message, "error"); btn.innerText = "AKTIFKAN SEKARANG"; }
-        };
-
-        window.loadActiveLocations = () => {
-            const q = query(collection(db, "active_events"), where("status", "==", "active"));
-            onSnapshot(q, (snap) => {
-                const list = document.getElementById('active-locations-list');
-                list.innerHTML = snap.empty ? '<p class="text-center py-8 text-[10px] text-gray-300 font-bold uppercase tracking-widest border-2 border-dashed border-gray-100 rounded-3xl">Tidak ada lokasi aktif</p>' : '';
-                
-                snap.forEach(async (d) => {
-                    const ev = d.data();
-                    
-                    if (ev.createdAt && (Date.now() - ev.createdAt > 10800000)) {
-                        console.log("Auto-closing event:", ev.name);
-                        await updateDoc(doc(db, "active_events", ev.id), { status: 'ended' });
-                        return;
-                    }
-
-                    const tglCantik = new Date(ev.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long' });
-                    const waLink = `https://wa.me/${ev.creatorWA}?text=${encodeURIComponent(`Konfirmasi Event: ${ev.name} di ${ev.location}`)}`;
-                    
-                    let auditHTML = localStorage.getItem('ms_role') === 'super_gm' ? `<a href="${waLink}" target="_blank" onclick="event.stopPropagation()" class="block w-full text-center bg-red-50 text-red-600 font-black text-[10px] uppercase py-2 rounded-xl mt-3 border border-red-100">👮 Konfirmasi / Audit GM</a>` : '';
-
-                    const item = document.createElement('div');
-                    item.className = "w-full bg-white p-5 rounded-3xl border border-gray-100 shadow-sm mb-3";
-                    item.innerHTML = `<div class="flex justify-between items-center cursor-pointer" onclick="selectLocation('${ev.id}')"><div class="text-left"><p class="text-[12px] font-black uppercase text-teal-700">Lokasi: ${ev.location}</p><p class="text-[10px] font-bold text-gray-400 uppercase">${ev.name}</p><p class="text-[8px] font-bold text-teal-500 uppercase mt-1">PJ: ${ev.creator || 'GM'}</p></div><span class="bg-teal-50 text-teal-600 text-[9px] px-4 py-2 rounded-full font-black uppercase">Buka</span></div>${auditHTML}`;
-                    list.appendChild(item);
-                });
-            });
-        };
-
-        window.selectLocation = async (eventId) => {
-            currentSelectedEventId = eventId;
-            const evSnap = await getDoc(doc(db, "active_events", eventId));
-            if(evSnap.exists()) {
-                const d = evSnap.data();
-                document.getElementById('gm-event-selector').classList.add('hidden');
-                document.getElementById('gm-active-display').classList.remove('hidden');
-                document.getElementById('display-ev-name').innerText = d.name;
-                document.getElementById('display-ev-info').innerText = `${d.date} • ${d.location}`;
-                document.getElementById('display-ev-creator').innerText = `Penanggung Jawab: ${d.creator}`;
-                document.getElementById('ev-qrcode-area').innerHTML = "";
-                new QRCode(document.getElementById('ev-qrcode-area'), { text: eventId, width: 220, height: 220, colorDark: "#0f766e" });
-                
-                const btnEnd = document.getElementById('btn-end-event');
-                if(localStorage.getItem('ms_role') === 'super_gm') {
-                    btnEnd.innerText = "HAPUS & TARIK POIN"; btnEnd.onclick = endEvent;
-                } else {
-                    btnEnd.innerText = "Event Selesai"; btnEnd.onclick = () => {
-                        Swal.fire({ title: 'Akhiri Event?', icon: 'question', showCancelButton: true, confirmButtonText: 'Ya' }).then(r => { if(r.isConfirmed) updateDoc(doc(db, "active_events", eventId), { status: 'ended' }).then(() => location.reload()); });
-                    };
-                }
+            if (t === 'member') {
+                btnMember.className = "flex-1 py-3 rounded-full text-[11px] font-black bg-white shadow-sm text-[#0f766e] uppercase tracking-wide transition-all";
+                btnGm.className = "flex-1 py-3 rounded-full text-[11px] font-black text-gray-400 uppercase tracking-wide transition-all";
+            } else {
+                btnGm.className = "flex-1 py-3 rounded-full text-[11px] font-black bg-white shadow-sm text-[#0f766e] uppercase tracking-wide transition-all";
+                btnMember.className = "flex-1 py-3 rounded-full text-[11px] font-black text-gray-400 uppercase tracking-wide transition-all";
             }
         };
-        window.closeEventView = () => { document.getElementById('gm-event-selector').classList.remove('hidden'); document.getElementById('gm-active-display').classList.add('hidden'); };
 
-        window.endEvent = async () => { 
-             Swal.fire({ title: 'HAPUS PERMANEN?', text: 'Poin user akan ditarik!', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33' }).then(async (r) => {
-                if(r.isConfirmed) {
-                    const evSnap = await getDoc(doc(db, "active_events", currentSelectedEventId));
-                    const pts = evSnap.data().points;
-                    const hSnap = await getDocs(query(collection(db, "history"), where("activityId", "==", currentSelectedEventId)));
-                    hSnap.forEach(async h => { await updateDoc(doc(db, "users", h.data().userId), { points: increment(-pts), presence_count: increment(-1) }); await deleteDoc(h.ref); });
-                    await updateDoc(doc(db, "active_events", currentSelectedEventId), { status: 'deleted' });
-                    location.reload();
-                }
-             });
-        };
-
-        window.openMemberScannerMode = () => { isGmScanning = false; startScanner(); };
-        window.openGMScannerMode = () => { isGmScanning = true; startScanner(); };
-
-        function startScanner() {
-            document.getElementById('scanner-modal').classList.remove('hidden');
-            html5QrCode = new Html5Qrcode("reader");
-            html5QrCode.start({ facingMode: "environment" }, { fps: 15, qrbox: 250 }, async (txt) => {
-                await html5QrCode.stop(); document.getElementById('scanner-modal').classList.add('hidden');
-                if (txt.toLowerCase().startsWith("http") || txt.toLowerCase().startsWith("www")) {
-                    Swal.fire({ title: 'Link Terdeteksi', text: 'Buka link ini?', showCancelButton: true, confirmButtonText: 'Ya' }).then(r => { if(r.isConfirmed) window.open(txt, '_blank'); });
-                    return; 
-                }
-                if (isGmScanning) { await processGmScan(txt); } else { await processMemberScan(txt); }
-            });
-        }
-
-        async function processGmScan(mid) {
-            if (!mid.includes("MS")) return Swal.fire("Gagal", "Bukan QR Member!", "error");
-            const evSnap = await getDoc(doc(db, "active_events", currentSelectedEventId));
-            const mRef = doc(db, "users", mid);
-            const mSnap = await getDoc(mRef);
-            if(!mSnap.exists()) return Swal.fire("Gagal", "Member tidak ditemukan", "error");
-            const logId = `${mid}_${evSnap.id}`;
-            const logCheck = await getDoc(doc(db, "history", logId));
-            if(logCheck.exists()) return Swal.fire("Info", "Sudah Absen", "warning");
-            await updateDoc(mRef, { points: increment(evSnap.data().points), presence_count: increment(1) });
-            await setDoc(doc(db, "history", logId), { userId: mid, userName: mSnap.data().name, userNik: mSnap.data().nik, activityId: evSnap.id, activity: `Hadir (Manual): ${evSnap.data().name}`, points: evSnap.data().points, date: serverTimestamp(), eventDate: evSnap.data().date });
-            Swal.fire("Sukses", `Absen ${mSnap.data().name}`, "success");
-        }
-
-        async function processMemberScan(eid) {
-            const hist = JSON.parse(localStorage.getItem('ms_device_history') || '{}');
-            if (hist[eid]) return Swal.fire("Stop", "HP ini sudah dipakai absen!", "error");
-            const evSnap = await getDoc(doc(db, "active_events", eid));
-            if(evSnap.exists() && evSnap.data().status === 'active') {
-                const uid = localStorage.getItem('ms_user_id');
-                const mRef = doc(db, "users", uid);
-                const logId = `${uid}_${eid}`;
-                const logCheck = await getDoc(doc(db, "history", logId));
-                if(logCheck.exists()) return Swal.fire("Info", "Anda sudah absen", "warning");
-                await updateDoc(mRef, { points: increment(evSnap.data().points), presence_count: increment(1) });
-                await setDoc(doc(db, "history", logId), { userId: uid, userName: document.getElementById('user-name').innerText, userNik: "SELF", activityId: eid, activity: `Hadir: ${evSnap.data().name}`, points: evSnap.data().points, date: serverTimestamp(), eventDate: evSnap.data().date });
-                hist[eid] = true; localStorage.setItem('ms_device_history', JSON.stringify(hist));
-                Swal.fire({ title: 'BERHASIL!', text: 'Poin masuk.', icon: 'success', timer: 2000, showConfirmButton: false }).then(() => location.reload());
-            } else { Swal.fire("Gagal", "QR Invalid / Event Tutup", "error"); }
-        }
-
-        window.loginAdmin = () => {
-            const u = document.getElementById('gm-user').value;
-            const p = document.getElementById('gm-pass').value;
-            if(u==="supergm" && btoa(p)==="amFudWFyaTIwMjY=") { localStorage.setItem('ms_role', 'super_gm'); loadApp(); }
-            else if(u==="gmbiasa" && btoa(p)==="TUFUVVIyMDI2") { localStorage.setItem('ms_role', 'gm'); loadApp(); }
-            else Swal.fire("Gagal", "Login salah", "error");
+        window.toggleMemberView = (m) => { 
+            document.getElementById('member-register-fields').classList.toggle('hidden', m === 'login'); 
+            document.getElementById('member-login-fields').classList.toggle('hidden', m !== 'login'); 
         };
 
         window.prosesDaftar = async () => {
             const n = document.getElementById('reg-name').value;
             const nik = document.getElementById('reg-nik').value;
-            const dom = document.getElementById('reg-domicile-input').value; // Get from Input
+            const dom = document.getElementById('reg-domicile-input').value;
             const wa = document.getElementById('reg-wa').value;
-            if(!n || nik.length!==16 || !dom) return Swal.fire("Gagal", "Data tidak lengkap / NIK salah", "warning");
-            if(!SURABAYA_LOCATIONS.includes(dom)) return Swal.fire("Wilayah Invalid", "Pilih wilayah dari saran yang muncul!", "warning");
+            const btn = document.getElementById('btn-daftar');
+
+            if(!n || nik.length!==16 || !dom) return Swal.fire("Gagal", "Data tidak lengkap atau NIK kurang dari 16 digit!", "warning");
+            if(!SURABAYA_LOCATIONS.includes(dom)) return Swal.fire("Wilayah Invalid", "Silakan pilih wilayah dari rekomendasi yang muncul saat diketik!", "warning");
+            
+            btn.innerText = "Mendaftarkan...";
+            
             try {
+                // Generate ID Unik: MS + 4 digit NIK terakhir + 4 digit timestamp terakhir
                 const id = `MS${nik.slice(-4)}${Date.now().toString().slice(-4)}`;
-                await setDoc(doc(db, "users", id), { name: n, nik: nik, domicile: dom, whatsapp: wa, points: 10, role: 'member', presence_count: 0 });
-                localStorage.setItem('ms_user_id', id); localStorage.setItem('ms_role', 'member'); location.reload();
-            } catch(e) { Swal.fire("Error", e.message, "error"); }
+                
+                await setDoc(doc(db, "users", id), { 
+                    name: n, 
+                    nik: nik, 
+                    domicile: dom, 
+                    whatsapp: wa, 
+                    points: 10, // Bonus awal
+                    role: 'member', 
+                    presence_count: 0 
+                });
+                
+                localStorage.setItem('ms_user_id', id); 
+                localStorage.setItem('ms_role', 'member'); 
+                
+                // PENTING: Redirect ke halaman Member
+                window.location.href = "member.html";
+            } catch(e) { 
+                Swal.fire("Error", e.message, "error"); 
+                btn.innerText = "Gabung Jadi Konektor";
+            }
         };
 
         window.restoreByNIK = async () => {
-            const q = query(collection(db, "users"), where("nik", "==", document.getElementById('login-nik').value), limit(1));
-            const snap = await getDocs(q);
-            if(!snap.empty) { localStorage.setItem('ms_user_id', snap.docs[0].id); localStorage.setItem('ms_role', 'member'); location.reload(); }
-            else Swal.fire("Gagal", "NIK tidak ditemukan", "error");
-        };
-
-        window.logout = () => { localStorage.clear(); location.reload(); };
-        window.exportDataCSV = async () => { /* Sama seperti sebelumnya */ };
-
-        window.processRedeem = async (id, cost, name, type) => {
-            const uid = localStorage.getItem('ms_user_id');
-            const uSnap = await getDoc(doc(db, "users", uid));
-            if(uSnap.data().points < cost) return Swal.fire("Gagal", "Poin kurang!", "error");
-            Swal.fire({ title: 'Tukar Poin', text: `Info ${type}:`, input: 'text', showCancelButton: true, confirmButtonText: 'Kirim' }).then(async (r) => {
-                if(r.isConfirmed && r.value) {
-                    await updateDoc(doc(db, "users", uid), { points: increment(-cost) });
-                    await addDoc(collection(db, "redeem_orders"), { userId: uid, userName: uSnap.data().name, userWA: uSnap.data().whatsapp, itemName: name, targetInfo: r.value, date: serverTimestamp(), status: 'pending' });
-                    Swal.fire("Berhasil", "Permintaan terkirim. Cek status berkala.", "success").then(() => location.reload());
-                }
-            });
-        };
-
-        async function loadRedeemOrders() {
-            const q = query(collection(db, "redeem_orders"), where("status", "==", "pending"), orderBy("date", "asc"));
-            onSnapshot(q, (snap) => {
-                const list = document.getElementById('gm-order-list');
-                list.innerHTML = snap.empty ? '<p class="text-gray-300 text-xs py-4">Tidak ada antrian.</p>' : '';
-                snap.forEach(d => {
-                    const o = d.data();
-                    let msg = o.itemName.toLowerCase().includes("pulsa") ? `Halo, Redeem *${o.itemName}* ke *${o.targetInfo}* valid?` : `Halo, Redeem *${o.itemName}* ke alamat *${o.targetInfo}* valid?`;
-                    const wa = `https://wa.me/${o.userWA}?text=${encodeURIComponent(msg)}`;
-                    list.innerHTML += `<div class="bg-white p-5 rounded-3xl border border-gray-100 mb-3"><p class="text-[11px] font-black uppercase text-teal-700">${o.userName}</p><p class="text-[10px] text-gray-500 font-bold">${o.itemName}</p><div class="bg-gray-50 p-2 rounded text-[10px] italic my-2">${o.targetInfo}</div><div class="flex gap-2"><a href="${wa}" target="_blank" class="flex-1 bg-emerald-50 text-emerald-600 py-2 rounded-xl text-[9px] font-black uppercase border border-emerald-100 block text-center">WhatsApp</a><button onclick="completeOrder('${d.id}')" class="flex-1 bg-gray-800 text-white py-2 rounded-xl text-[9px] font-black uppercase">Selesai</button></div></div>`;
-                });
-            });
-        }
-
-        window.completeOrder = async (id) => {
-            Swal.fire({ title: 'Selesaikan?', text: "Status akan berubah jadi Selesai.", icon: 'question', showCancelButton: true, confirmButtonText: 'Ya' }).then(async r => {
-                if(r.isConfirmed) await updateDoc(doc(db, "redeem_orders", id), { status: 'completed' });
-            });
-        };
-
-        window.loadMemberRedeemHistory = async () => {
-            const uid = localStorage.getItem('ms_user_id');
-            const list = document.getElementById('my-orders-list');
-            list.innerHTML = "<p class='text-center text-xs text-gray-400 mt-4'>Sedang memuat data...</p>";
-            document.getElementById('my-orders-modal').classList.remove('hidden');
+            const nik = document.getElementById('login-nik').value;
+            const btn = document.querySelector('#member-login-fields button');
             
-            const q = query(collection(db, "redeem_orders"), where("userId", "==", uid), orderBy("date", "desc"));
-            const snap = await getDocs(q);
+            if(nik.length !== 16) return Swal.fire("Gagal", "NIK harus 16 digit!", "warning");
             
-            // REVISI 2: TAMPILAN KOSONG YANG LEBIH JELAS
-            if (snap.empty) {
-                list.innerHTML = `
-                <div class="flex flex-col items-center justify-center h-40 text-gray-400">
-                    <span class="text-4xl mb-2">🤷‍♂️</span>
-                    <p class="font-black text-xs uppercase">BELUM ADA REDEEM YANG KAMU LAKUKAN</p>
-                </div>`;
-            } else {
-                list.innerHTML = "";
-                snap.forEach(d => {
-                    const o = d.data();
-                    const statusColor = o.status === 'completed' ? 'bg-green-100 text-green-600 border-green-200' : 'bg-yellow-50 text-yellow-600 border-yellow-100';
-                    const statusText = o.status === 'completed' ? 'SELESAI' : 'DIPROSES';
-                    list.innerHTML += `<div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-center"><div><p class="text-xs font-black text-gray-700">${o.itemName}</p><p class="text-[9px] text-gray-400">${new Date(o.date.seconds*1000).toLocaleDateString()}</p></div><span class="px-3 py-1 rounded-full text-[9px] font-black border ${statusColor}">${statusText}</span></div>`;
-                });
-            }
-        };
-
-        async function loadLeaderboard() {
-            const list = document.getElementById('leaderboard-list');
+            btn.innerText = "Mencari Data...";
+            
             try {
-                const q = query(collection(db, "users"), orderBy("points", "desc"), limit(5));
+                const q = query(collection(db, "users"), where("nik", "==", nik), limit(1));
                 const snap = await getDocs(q);
-                list.innerHTML = "";
-                let rank = 1;
-                snap.forEach(d => {
-                    const u = d.data();
-                    let medal = rank === 1 ? '🥇' : (rank === 2 ? '🥈' : (rank === 3 ? '🥉' : `#${rank}`));
-                    list.innerHTML += `<div class="flex justify-between items-center border-b border-yellow-100 pb-1 mb-1 last:border-0"><div class="text-left flex items-center gap-2"><span class="font-black text-sm w-6">${medal}</span><div><p class="text-[10px] font-bold text-gray-700 uppercase leading-none">${u.name.split(' ')[0]}***</p><p class="text-[8px] text-gray-400 leading-none">${u.domicile.split(') ')[1] || u.domicile}</p></div></div><span class="text-[10px] font-black text-teal-600">${u.points} P</span></div>`;
-                    rank++;
-                });
-            } catch (e) { list.innerHTML = `<p class="text-[8px] text-red-300">Leaderboard butuh Index Firestore</p>`; console.log(e); }
-        }
-
-        function renderCatalog() { document.getElementById('redeem-catalog').innerHTML = CATALOG.map(i => `<div class="bg-white p-5 rounded-3xl flex items-center justify-between border border-gray-100 shadow-sm"><div><p class="font-black text-xs uppercase italic text-gray-800">${i.name}</p><p class="text-teal-600 font-bold text-[10px]">${i.cost} Poin</p></div><button onclick="processRedeem('${i.id}', ${i.cost}, '${i.name}', '${i.type}')" class="bg-gray-900 text-white text-[9px] font-black px-6 py-3 rounded-full">TUKAR</button></div>`).join(''); }
-
-        function loadHistory(uid) {
-            const q = query(collection(db, "history"), where("userId", "==", uid));
-            onSnapshot(q, (snap) => {
-                const list = document.getElementById('history-list');
-                if(snap.empty) { list.innerHTML = '<p class="text-[9px] text-gray-300 py-6 uppercase font-black text-center italic">Belum ada riwayat</p>'; return; }
-                const docs = snap.docs.map(d => d.data()).sort((a,b) => (b.date?.seconds || 0) - (a.date?.seconds || 0));
-                list.innerHTML = docs.map(h => `<div class="p-4 bg-gray-50 rounded-2xl flex justify-between items-center text-[10px] font-bold uppercase border border-gray-100 mb-2"><div class="text-left"><p class="text-gray-700">${h.activity}</p><p class="text-[8px] text-gray-400 font-medium mt-0.5">${h.eventDate || 'Hari ini'}</p></div><span class="${h.points < 0 ? 'text-red-500' : 'text-teal-600'} text-xs font-black">+${h.points}</span></div>`).join('');
-            });
-        }
-
-        async function loadApp() {
-            setupListeners();
-            const role = localStorage.getItem('ms_role');
-            const uid = localStorage.getItem('ms_user_id');
-
-            if (role && role.includes('gm')) {
-                document.getElementById('tab-awal').classList.add('hidden');
-                document.getElementById('tab-gm').classList.remove('hidden');
-                if(role === 'super_gm') {
-                    document.getElementById('super-stats').classList.remove('hidden');
-                    document.getElementById('btn-view-archive').classList.remove('hidden');
-                    try { const mSnap = await getDocs(collection(db, "users")); document.getElementById('total-members').innerText = `${mSnap.size}`; } catch (e) {}
+                
+                if(!snap.empty) { 
+                    localStorage.setItem('ms_user_id', snap.docs[0].id); 
+                    localStorage.setItem('ms_role', 'member'); 
+                    // PENTING: Redirect ke halaman Member
+                    window.location.href = "member.html";
+                } else { 
+                    Swal.fire("Gagal", "NIK tidak ditemukan, silakan mendaftar.", "error"); 
                 }
-                loadActiveLocations(); 
-            } else if (role === 'member' && uid) {
-                document.getElementById('tab-awal').classList.add('hidden');
-                document.getElementById('tab-anggota').classList.remove('hidden');
-                document.getElementById('member-nav').classList.remove('hidden');
-                try {
-                    const uSnap = await getDoc(doc(db, "users", uid));
-                    if(uSnap.exists()) {
-                        const d = uSnap.data();
-                        document.getElementById('user-points').innerText = d.points.toLocaleString();
-                        document.getElementById('user-name').innerText = d.name;
-                        document.getElementById('user-id-text').innerText = "ID: " + uid;
-                        document.getElementById("qrcode-area").innerHTML = "";
-                        new QRCode(document.getElementById("qrcode-area"), { text: uid, width: 200, height: 200, colorDark: "#0f766e" });
-                        loadHistory(uid);
-                        loadLeaderboard();
-                    } else { Swal.fire("Info", "Akun tidak ditemukan", "info").then(() => logout()); }
-                } catch (e) {}
+            } catch(e) {
+                Swal.fire("Error", e.message, "error");
+            } finally {
+                btn.innerText = "Masuk Aplikasi";
+            }
+        };
+
+        window.loginAdmin = () => {
+            const u = document.getElementById('gm-user').value;
+            const p = document.getElementById('gm-pass').value;
+            
+            // Logika Auth Hardcode (Tetap sama seperti aslinya)
+            if(u === "supergm" && btoa(p) === "amFudWFyaTIwMjY=") { 
+                localStorage.setItem('ms_role', 'super_gm'); 
+                window.location.href = "gm.html"; // Redirect ke halaman GM
+            }
+            else if(u === "gmbiasa" && btoa(p) === "TUFUVVIyMDI2") { 
+                localStorage.setItem('ms_role', 'gm'); 
+                window.location.href = "gm.html"; // Redirect ke halaman GM
+            }
+            else {
+                Swal.fire("Akses Ditolak", "Username atau Password salah!", "error");
+            }
+        };
+
+        // --- SISTEM PENJAGA PINTU (ROUTER SEDERHANA) ---
+        // Mengecek apakah user sudah login sebelumnya
+        function checkSession() {
+            const role = localStorage.getItem('ms_role');
+            if (role === 'member' && localStorage.getItem('ms_user_id')) {
+                window.location.href = "member.html";
+            } else if (role === 'gm' || role === 'super_gm') {
+                window.location.href = "gm.html";
             } else {
-                document.getElementById('tab-awal').classList.remove('hidden');
+                // Jika tidak ada session, jalankan setup autocomplete form
+                setupAutocomplete();
             }
         }
+
+        // Jalankan pengecekan saat halaman dimuat
+        checkSession();
         
-        loadApp();
     </script>
 </body>
 </html>
