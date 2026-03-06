@@ -52,7 +52,7 @@
 
         <div class="flex bg-white rounded-full p-1.5 mb-6 shadow-sm border border-green-50 text-center">
             <button id="nav-gm-event" onclick="showGMSection('event')" class="flex-1 py-3 rounded-full text-[10px] font-black bg-[#0f766e] text-white uppercase text-center tracking-wide transition-all">Event Manager</button>
-            <button id="nav-gm-orders" onclick="showGMSection('orders')" class="flex-1 py-3 rounded-full text-[10px] font-black text-gray-400 uppercase text-center tracking-wide transition-all">Data Redeem</button>
+            <button id="nav-gm-orders" onclick="showGMSection('orders')" class="flex-1 py-3 rounded-full text-[10px] font-black text-gray-400 uppercase text-center tracking-wide transition-all">Data Pencairan</button>
         </div>
 
         <div id="gm-section-event">
@@ -90,7 +90,9 @@
                 
                 <div class="grid grid-cols-2 gap-2">
                     <select id="ev-points" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-green-100 outline-none font-black text-primary text-center text-xs">
-                        <option value="5">5 Poin</option><option value="10" selected>10 Poin</option><option value="20">20 Poin</option>
+                        <option value="3">3 Poin (Rp 3.000)</option>
+                        <option value="5" selected>5 Poin (Rp 5.000)</option>
+                        <option value="10">10 Poin (Rp 10.000)</option>
                     </select>
                     <select id="ev-cooldown" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-red-100 outline-none font-black text-red-500 text-center text-xs">
                         <option value="15">Jeda 15 Mnt</option>
@@ -627,9 +629,7 @@
                 list.innerHTML = '';
                 snap.forEach(d => {
                     const o = d.data();
-                    let msg = o.itemName.toLowerCase().includes("pulsa") 
-                        ? `Halo Konektor *${o.userName}*, konfirmasi penukaran *${o.itemName}* ke nomor *${o.targetInfo}* valid?` 
-                        : `Halo Konektor *${o.userName}*, konfirmasi penukaran *${o.itemName}* untuk dikirim ke alamat *${o.targetInfo}* valid?`;
+                    let msg = `Halo Konektor *${o.userName}*, konfirmasi pengajuan *${o.itemName}* untuk ditransfer ke rekening/e-wallet *${o.targetInfo}* valid?`;
                     
                     const wa = `https://wa.me/${o.userWA}?text=${encodeURIComponent(msg)}`;
                     
@@ -659,7 +659,7 @@
                 if(r.isConfirmed) {
                     try {
                         await updateDoc(doc(db, "redeem_orders", id), { status: 'completed' });
-                        Swal.fire("Sukses", "Data redeem berhasil diselesaikan.", "success");
+                        Swal.fire("Sukses", "Pencairan dana berhasil ditandai selesai.", "success");
                     } catch (e) {
                         Swal.fire("Error", "Gagal mengupdate status.", "error");
                     }

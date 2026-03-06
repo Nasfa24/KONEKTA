@@ -67,14 +67,14 @@
         </div>
 
         <div id="section-redeem" class="hidden space-y-4">
-            <button onclick="loadMemberRedeemHistory()" class="w-full bg-white border border-gray-200 text-gray-600 py-3 rounded-2xl font-black uppercase text-[10px] shadow-sm active:scale-95 mb-2 hover:bg-gray-50">📦 Cek Status Penukaran Saya</button>
+            <button onclick="loadMemberRedeemHistory()" class="w-full bg-white border border-gray-200 text-gray-600 py-3 rounded-2xl font-black uppercase text-[10px] shadow-sm active:scale-95 mb-2 hover:bg-gray-50">💸 Cek Status Pencairan Dana</button>
             <div id="redeem-catalog" class="grid grid-cols-1 gap-3"></div>
         </div>
     </div>
 
     <div id="member-nav" class="fixed bottom-6 left-6 right-6 bg-white/90 backdrop-blur-md border border-gray-200 p-2 rounded-full flex justify-around max-w-sm mx-auto z-40 shadow-2xl">
         <button id="nav-qr" onclick="showSection('qr')" class="flex-1 py-3 rounded-full flex flex-col items-center justify-center nav-active transition-all"><span class="text-xl mb-0.5">🏠</span><span class="text-[7px] font-black uppercase tracking-widest">Home</span></button>
-        <button id="nav-redeem" onclick="showSection('redeem')" class="flex-1 py-3 rounded-full flex flex-col items-center justify-center text-gray-400 hover:text-gray-600 transition-all"><span class="text-xl mb-0.5">🎁</span><span class="text-[7px] font-black uppercase tracking-widest">Redeem</span></button>
+        <button id="nav-redeem" onclick="showSection('redeem')" class="flex-1 py-3 rounded-full flex flex-col items-center justify-center text-gray-400 hover:text-gray-600 transition-all"><span class="text-xl mb-0.5">💸</span><span class="text-[7px] font-black uppercase tracking-widest">Tarik Dana</span></button>
     </div>
 
     <div id="scanner-modal" class="hidden fixed inset-0 bg-black/95 z-50 flex flex-col items-center justify-center p-6 text-white text-center">
@@ -87,13 +87,13 @@
     <div id="my-orders-modal" class="hidden fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-[2rem] w-full max-w-md max-h-[85vh] overflow-hidden flex flex-col shadow-2xl relative">
             <div class="p-6 pb-2 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
-                <h2 class="text-lg font-black text-[#0f766e] uppercase">Status Penukaran</h2>
+                <h2 class="text-lg font-black text-[#0f766e] uppercase">Status Pencairan Dana</h2>
                 <button onclick="document.getElementById('my-orders-modal').classList.add('hidden')" class="bg-gray-200 w-8 h-8 rounded-full flex items-center justify-center text-gray-500 font-bold hover:bg-red-100 hover:text-red-500 transition-all">✕</button>
             </div>
             <div id="my-orders-list" class="p-6 overflow-y-auto space-y-3 bg-gray-50 min-h-[200px]"></div>
             <div class="p-4 border-t border-gray-100 bg-white text-center">
-                <p class="text-[10px] text-red-600 font-bold mb-2 uppercase">Jika penukaran belum diproses > 24 jam, hubungi Admin.</p>
-                <a href="https://wa.me/6281339760265?text=Halo%20Admin%2C%20mau%20tanya%20status%20redeem%20saya..." target="_blank" class="block w-full bg-green-50 text-green-600 font-black text-[10px] uppercase py-3 rounded-xl border border-green-100">Hubungi Admin</a>
+                <p class="text-[10px] text-red-600 font-bold mb-2 uppercase">Jika pencairan belum diproses > 24 jam, hubungi Admin.</p>
+                <a href="https://wa.me/6281339760265?text=Halo%20Admin%2C%20mau%20tanya%20status%20pencairan%20dana%20saya..." target="_blank" class="block w-full bg-green-50 text-green-600 font-black text-[10px] uppercase py-3 rounded-xl border border-green-100">Hubungi Admin</a>
             </div>
         </div>
     </div>
@@ -116,11 +116,11 @@
 
         let html5QrCode = null;
 
-        // Katalog Hadiah
+        // Katalog Pencairan Uang (1 Poin = Rp 1.000)
         const CATALOG = [
-            { id: 'R01', name: 'Pulsa 20rb', cost: 100, type: 'Nomor HP' },
-            { id: 'R02', name: 'Beras 3kg', cost: 150, type: 'Alamat Lengkap' },
-            { id: 'R03', name: 'Paket Sembako', cost: 300, type: 'Alamat Lengkap' }
+            { id: 'R01', name: 'Pencairan Dana Rp 200.000', cost: 200, type: 'Nama Bank & No. Rekening / E-Wallet' },
+            { id: 'R02', name: 'Pencairan Dana Rp 500.000', cost: 500, type: 'Nama Bank & No. Rekening / E-Wallet' },
+            { id: 'R03', name: 'Pencairan Dana Rp 1.000.000', cost: 1000, type: 'Nama Bank & No. Rekening / E-Wallet' }
         ];
 
         // --- CORE FUNCTIONS ---
@@ -182,7 +182,7 @@
         }
 
         function renderCatalog() { 
-            document.getElementById('redeem-catalog').innerHTML = CATALOG.map(i => `<div class="bg-white p-5 rounded-3xl flex items-center justify-between border border-gray-100 shadow-sm hover:shadow-md transition-shadow"><div><p class="font-black text-xs uppercase italic text-gray-800">${i.name}</p><p class="text-teal-600 font-bold text-[10px]">${i.cost} Poin</p></div><button onclick="processRedeem('${i.id}', ${i.cost}, '${i.name}', '${i.type}')" class="bg-gray-900 text-white text-[9px] font-black px-6 py-3 rounded-full active:scale-95 transition-transform">TUKAR</button></div>`).join(''); 
+            document.getElementById('redeem-catalog').innerHTML = CATALOG.map(i => `<div class="bg-white p-5 rounded-3xl flex items-center justify-between border border-gray-100 shadow-sm hover:shadow-md transition-shadow"><div><p class="font-black text-xs uppercase italic text-gray-800">${i.name}</p><p class="text-teal-600 font-bold text-[10px]">Butuh ${i.cost} Poin</p></div><button onclick="processRedeem('${i.id}', ${i.cost}, '${i.name}', '${i.type}')" class="bg-gray-900 text-white text-[9px] font-black px-6 py-3 rounded-full active:scale-95 transition-transform">TUKAR</button></div>`).join(''); 
         }
 
         // --- SCANNER EVENT LOGIC ---
@@ -269,8 +269,8 @@
             }
             
             Swal.fire({ 
-                title: 'Tukar Poin', 
-                text: `Masukkan ${type} untuk pengiriman:`, 
+                title: 'Pencairan Dana', 
+                text: `Masukkan ${type}:`, 
                 input: 'text', 
                 showCancelButton: true, 
                 confirmButtonColor: '#0f766e',
@@ -289,9 +289,9 @@
                             date: serverTimestamp(), 
                             status: 'pending' 
                         });
-                        Swal.fire("Berhasil", "Permintaan terkirim. Admin akan menghubungi Anda via WA.", "success").then(() => location.reload());
+                        Swal.fire("Berhasil", "Permintaan pencairan dana terkirim. Admin akan menghubungi Anda via WA.", "success").then(() => location.reload());
                     } catch (e) {
-                        Swal.fire("Error", "Gagal melakukan penukaran.", "error");
+                        Swal.fire("Error", "Gagal melakukan penarikan.", "error");
                     }
                 }
             });
@@ -310,7 +310,7 @@
                     list.innerHTML = `
                     <div class="flex flex-col items-center justify-center h-40 text-gray-400">
                         <span class="text-4xl mb-2">🤷‍♂️</span>
-                        <p class="font-black text-xs uppercase text-center mt-2 tracking-widest">Belum ada penukaran hadiah.</p>
+                        <p class="font-black text-xs uppercase text-center mt-2 tracking-widest">Belum ada riwayat pencairan.</p>
                     </div>`;
                 } else {
                     list.innerHTML = "";
