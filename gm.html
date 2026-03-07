@@ -32,7 +32,7 @@
                 <img src="https://appkonekta.fun/logo.png" alt="Logo" class="w-12 h-auto object-contain" onerror="this.style.display='none'">
                 <div>
                     <h2 class="text-2xl font-black uppercase text-[#0f766e] tracking-tighter text-left">KONEKTA</h2>
-                    <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest text-left">Console Admin</p>
+                    <p id="admin-greeting" class="text-[9px] font-bold text-gray-400 uppercase tracking-widest text-left">Console Admin</p>
                 </div>
             </div>
             <button onclick="logout()" class="bg-red-50 text-red-500 px-4 py-2 rounded-full text-[10px] font-black uppercase hover:bg-red-100 transition-colors">Keluar</button>
@@ -51,8 +51,9 @@
         </div>
 
         <div class="flex bg-white rounded-full p-1.5 mb-6 shadow-sm border border-green-50 text-center">
-            <button id="nav-gm-event" onclick="showGMSection('event')" class="flex-1 py-3 rounded-full text-[10px] font-black bg-[#0f766e] text-white uppercase text-center tracking-wide transition-all">Event Manager</button>
-            <button id="nav-gm-orders" onclick="showGMSection('orders')" class="flex-1 py-3 rounded-full text-[10px] font-black text-gray-400 uppercase text-center tracking-wide transition-all">Data Pencairan</button>
+            <button id="nav-gm-event" onclick="showGMSection('event')" class="flex-1 py-3 rounded-full text-[10px] font-black bg-[#0f766e] text-white uppercase text-center tracking-wide transition-all">Event</button>
+            <button id="nav-gm-orders" onclick="showGMSection('orders')" class="flex-1 py-3 rounded-full text-[10px] font-black text-gray-400 uppercase text-center tracking-wide transition-all">Pencairan</button>
+            <button id="nav-gm-korlap" onclick="showGMSection('korlap')" class="hidden flex-1 py-3 rounded-full text-[10px] font-black text-gray-400 uppercase text-center tracking-wide transition-all border-l border-gray-100">Korlap</button>
         </div>
 
         <div id="gm-section-event">
@@ -85,10 +86,13 @@
                 <div class="w-full text-left ml-2 mb-1 mt-2"><label class="text-[9px] font-black text-teal-600 uppercase tracking-widest">Tanggal Pelaksanaan</label></div>
                 <input type="date" id="ev-date" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none font-bold text-gray-700 text-center focus:border-primary transition-all cursor-pointer">
                 <input type="text" id="ev-loc" placeholder="Lokasi (Contoh: Zona A)" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none font-bold text-sm focus:border-primary transition-all">
-                <input type="text" id="ev-creator" placeholder="Nama Penanggung Jawab" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none font-bold text-sm focus:border-primary transition-all text-teal-700 mt-2">
-                <input type="text" inputmode="numeric" id="ev-wa" placeholder="No. WA PJ (Wajib)" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none font-bold text-sm focus:border-primary transition-all text-teal-700 mt-2">
                 
-                <div class="grid grid-cols-2 gap-2">
+                <div class="bg-gray-50 p-4 rounded-2xl border border-gray-200 mt-2 text-left">
+                    <p class="text-[8px] font-black text-gray-400 uppercase tracking-widest">Penanggung Jawab:</p>
+                    <p id="creator-display-name" class="text-xs font-bold text-teal-700 mt-0.5">Memuat...</p>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-2 mt-2">
                     <select id="ev-points" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-green-100 outline-none font-black text-primary text-center text-xs">
                         <option value="3">3 Poin (Rp 3.000)</option>
                         <option value="5" selected>5 Poin (Rp 5.000)</option>
@@ -133,6 +137,22 @@
 
         <div id="gm-section-orders" class="hidden space-y-4">
             <div id="gm-order-list" class="space-y-4 text-center"></div>
+        </div>
+
+        <div id="gm-section-korlap" class="hidden space-y-4">
+            <div class="bg-white p-6 rounded-[2.5rem] shadow-xl border border-green-100 text-left">
+                <h3 class="text-center font-black uppercase text-lg text-gray-800 tracking-tight mb-2">Daftarkan Korlap Baru</h3>
+                <p class="text-[9px] text-gray-400 text-center uppercase tracking-widest mb-6">Beri Akses GM Untuk Pimpinan Wilayah</p>
+                
+                <div class="space-y-3">
+                    <input type="text" id="korlap-user" placeholder="Buat Username (Contoh: korlap_gubeng)" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none font-bold text-sm focus:border-[#0f766e] transition-all">
+                    <input type="text" id="korlap-pass" placeholder="Buat Password" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none font-bold text-sm focus:border-[#0f766e] transition-all">
+                    <input type="text" id="korlap-name" placeholder="Nama Lengkap Korlap" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none font-bold text-sm focus:border-[#0f766e] transition-all">
+                    <input type="text" inputmode="numeric" id="korlap-wa" placeholder="No. WhatsApp Korlap (Awali 62)" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none font-bold text-sm focus:border-[#0f766e] transition-all">
+                    
+                    <button id="btn-submit-korlap" onclick="createKorlap()" class="w-full bg-gray-900 text-white py-4 rounded-2xl font-black shadow-lg uppercase text-xs active:scale-95 text-center mt-4">Simpan Akun Korlap</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -187,29 +207,33 @@
     </div>
 
     <script type="module">
-        // Import db dari firebase-config.js
         import { db } from './firebase-config.js';
-        
-        // Import fungsi Firestore
         import { doc, getDoc, updateDoc, increment, setDoc, collection, query, where, orderBy, limit, getDocs, onSnapshot, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // --- PENJAGA PINTU (GATEKEEPER) ---
         const role = localStorage.getItem('ms_role');
+        const adminName = localStorage.getItem('ms_admin_name') || 'Admin';
+        const adminWA = localStorage.getItem('ms_admin_wa') || '';
+        
         if (role !== 'gm' && role !== 'super_gm') {
             window.location.href = "index.html";
         }
 
-        // Tampilkan fitur SuperGM jika rolenya sesuai
+        // Tampilkan Identitas Admin
+        document.getElementById('admin-greeting').innerText = `Halo, ${adminName}`;
+        document.getElementById('creator-display-name').innerText = adminName;
+
+        // Otoritas Khusus Super GM
         if (role === 'super_gm') {
             document.getElementById('super-stats').classList.remove('hidden');
             document.getElementById('btn-view-archive').classList.remove('hidden');
+            document.getElementById('nav-gm-korlap').classList.remove('hidden'); // Tampilkan tab Korlap
         }
         
         let html5QrCode = null;
         let currentSelectedEventId = null;
         let currentAttendeeData = [];
 
-        // Hitung Total Member (Super GM)
+        // Hitung Total Member
         if(role === 'super_gm') {
             getDocs(query(collection(db, "users"), where("role", "==", "member"))).then(snap => {
                 document.getElementById('total-members').innerText = snap.size;
@@ -220,8 +244,14 @@
         window.showGMSection = (s) => {
             document.getElementById('gm-section-event').classList.toggle('hidden', s !== 'event');
             document.getElementById('gm-section-orders').classList.toggle('hidden', s !== 'orders');
+            document.getElementById('gm-section-korlap').classList.toggle('hidden', s !== 'korlap');
+            
             document.getElementById('nav-gm-event').className = s === 'event' ? "flex-1 py-3 rounded-full text-[10px] font-black bg-[#0f766e] text-white uppercase tracking-wide transition-all" : "flex-1 py-3 rounded-full text-[10px] font-black text-gray-400 uppercase tracking-wide transition-all";
             document.getElementById('nav-gm-orders').className = s === 'orders' ? "flex-1 py-3 rounded-full text-[10px] font-black bg-[#0f766e] text-white uppercase tracking-wide transition-all" : "flex-1 py-3 rounded-full text-[10px] font-black text-gray-400 uppercase tracking-wide transition-all";
+            
+            if(role === 'super_gm') {
+                document.getElementById('nav-gm-korlap').className = s === 'korlap' ? "flex-1 py-3 rounded-full text-[10px] font-black bg-[#0f766e] text-white uppercase tracking-wide transition-all border-l border-gray-100" : "flex-1 py-3 rounded-full text-[10px] font-black text-gray-400 uppercase tracking-wide transition-all border-l border-gray-100";
+            }
             
             if(s === 'orders') loadRedeemOrders();
         };
@@ -251,6 +281,9 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     localStorage.removeItem('ms_role');
+                    localStorage.removeItem('ms_admin_name');
+                    localStorage.removeItem('ms_admin_id');
+                    localStorage.removeItem('ms_admin_wa');
                     window.location.href = "index.html";
                 }
             });
@@ -260,15 +293,12 @@
 
         window.createEvent = async () => {
             const btn = document.getElementById('btn-submit-event');
-            const creatorWA = document.getElementById('ev-wa').value.replace(/\D/g, '');
             const cooldownMins = parseInt(document.getElementById('ev-cooldown').value);
             
-            if(!document.getElementById('ev-name').value || !document.getElementById('ev-date').value || !document.getElementById('ev-loc').value || !document.getElementById('ev-creator').value) {
+            if(!document.getElementById('ev-name').value || !document.getElementById('ev-date').value || !document.getElementById('ev-loc').value) {
                 return Swal.fire("Data Kurang", "Lengkapi semua data!", "warning");
             }
-            if(creatorWA.length < 10) return Swal.fire("WA Invalid", "Nomor WA minimal 10 digit!", "warning");
 
-            // Cek Anti-Spam (Cooldown)
             const lastCreated = localStorage.getItem('gm_last_created_time');
             if (lastCreated && role !== 'super_gm') {
                 const elapsed = Date.now() - parseInt(lastCreated);
@@ -287,8 +317,8 @@
                     name: document.getElementById('ev-name').value, 
                     date: document.getElementById('ev-date').value, 
                     location: document.getElementById('ev-loc').value, 
-                    creator: document.getElementById('ev-creator').value, 
-                    creatorWA: creatorWA.startsWith('0') ? '62' + creatorWA.slice(1) : creatorWA, 
+                    creator: adminName, // Otomatis dari sistem
+                    creatorWA: adminWA.startsWith('0') ? '62' + adminWA.slice(1) : adminWA, 
                     points: parseInt(document.getElementById('ev-points').value), 
                     status: 'active', 
                     id: eventId,
@@ -312,7 +342,6 @@
                 snap.forEach(async (d) => {
                     const ev = d.data();
                     
-                    // Auto-close jika lebih dari 3 jam (10800000 ms)
                     if (ev.createdAt && (Date.now() - ev.createdAt > 10800000)) {
                         await updateDoc(doc(db, "active_events", ev.id), { status: 'ended' });
                         return;
@@ -353,11 +382,9 @@
                     document.getElementById('display-ev-info').innerText = `${d.date} • ${d.location}`;
                     document.getElementById('display-ev-creator').innerText = `Penanggung Jawab: ${d.creator}`;
                     
-                    // Render QR Code Event
                     document.getElementById('ev-qrcode-area').innerHTML = "";
                     new QRCode(document.getElementById('ev-qrcode-area'), { text: eventId, width: 220, height: 220, colorDark: "#0f766e" });
                     
-                    // Konfigurasi Tombol "End Event" berdasarkan role
                     const btnEnd = document.getElementById('btn-end-event');
                     if(role === 'super_gm') {
                         btnEnd.innerText = "HAPUS & TARIK POIN"; 
@@ -392,10 +419,8 @@
                         const evSnap = await getDoc(doc(db, "active_events", currentSelectedEventId));
                         const pts = evSnap.data().points;
                         
-                        // Cari semua history yang terhubung dengan event ini
                         const hSnap = await getDocs(query(collection(db, "history"), where("activityId", "==", currentSelectedEventId)));
                         
-                        // Tarik poin dari masing-masing user dan hapus log history
                         const updatePromises = hSnap.docs.map(async h => {
                             await updateDoc(doc(db, "users", h.data().userId), { points: increment(-pts), presence_count: increment(-1) });
                             await deleteDoc(h.ref);
@@ -517,18 +542,15 @@
             btn.innerText = "Memuat...";
             
             try {
-                // Tarik semua user ber-role member (Hanya untuk Super GM)
                 const snap = await getDocs(query(collection(db, "users"), where("role", "==", "member")));
                 const regionCounts = {};
                 
                 snap.forEach(doc => { 
                     const d = doc.data(); 
-                    // Bersihkan prefix kurung tutup jika ada
                     const dom = d.domicile ? (d.domicile.includes(') ') ? d.domicile.split(') ')[1] : d.domicile) : "Tidak Diketahui"; 
                     regionCounts[dom] = (regionCounts[dom] || 0) + 1; 
                 });
                 
-                // Sorting terbanyak ke terdikit
                 const sortedRegions = Object.entries(regionCounts).sort(([, a], [, b]) => b - a);
                 
                 const tbody = document.getElementById('region-table-body'); 
@@ -630,7 +652,6 @@
                 snap.forEach(d => {
                     const o = d.data();
                     let msg = `Halo Konektor *${o.userName}*, konfirmasi pengajuan *${o.itemName}* untuk ditransfer ke rekening/e-wallet *${o.targetInfo}* valid?`;
-                    
                     const wa = `https://wa.me/${o.userWA}?text=${encodeURIComponent(msg)}`;
                     
                     list.innerHTML += `
@@ -665,6 +686,41 @@
                     }
                 }
             });
+        };
+
+        // --- TAMBAHAN: FUNGSI BUAT KORLAP BARU (KHUSUS SUPER GM) ---
+        window.createKorlap = async () => {
+            const u = document.getElementById('korlap-user').value.toLowerCase().replace(/\s+/g, '');
+            const p = document.getElementById('korlap-pass').value;
+            const n = document.getElementById('korlap-name').value;
+            const wa = document.getElementById('korlap-wa').value;
+            const btn = document.getElementById('btn-submit-korlap');
+
+            if(!u || !p || !n || !wa) return Swal.fire("Gagal", "Semua kolom wajib diisi!", "warning");
+            
+            btn.innerText = "Menyimpan...";
+            try {
+                // Simpan ke collection 'admins'
+                await setDoc(doc(db, "admins", u), {
+                    name: n,
+                    wa: wa.startsWith('0') ? '62' + wa.slice(1) : wa,
+                    password: p,
+                    role: 'gm',
+                    createdAt: serverTimestamp()
+                });
+                
+                Swal.fire("Sukses", `Akun Korlap ${n} berhasil dibuat!\nUsername: ${u}\nPassword: ${p}`, "success");
+                
+                // Kosongkan form
+                document.getElementById('korlap-user').value = '';
+                document.getElementById('korlap-pass').value = '';
+                document.getElementById('korlap-name').value = '';
+                document.getElementById('korlap-wa').value = '';
+            } catch (e) {
+                Swal.fire("Error", "Gagal membuat akun.", "error");
+            } finally {
+                btn.innerText = "Simpan Akun Korlap";
+            }
         };
 
         // Initialize active locations on load

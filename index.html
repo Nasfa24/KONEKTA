@@ -74,7 +74,7 @@
             </div>
 
             <div id="form-gm" class="hidden space-y-4">
-                <input type="text" id="gm-user" placeholder="Username" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none focus:border-[#0f766e] focus:bg-white transition-all font-bold text-gray-700">
+                <input type="text" id="gm-user" placeholder="Username GM" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none focus:border-[#0f766e] focus:bg-white transition-all font-bold text-gray-700">
                 <input type="password" id="gm-pass" placeholder="Password" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none focus:border-[#0f766e] focus:bg-white transition-all font-bold text-gray-700">
                 <button onclick="loginAdmin()" class="w-full bg-gray-800 text-white py-4 rounded-2xl font-bold uppercase text-xs active:scale-95 shadow-lg transition-transform hover:bg-gray-900">Login Console</button>
             </div>
@@ -82,13 +82,12 @@
     </div>
 
     <script type="module">
-        // Import db dari firebase-config.js
         import { db } from './firebase-config.js';
         
-        // Import fungsi Firestore
-        import { doc, setDoc, collection, query, where, getDocs, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        // Tambahkan getDoc untuk mengecek database admin
+        import { doc, getDoc, setDoc, collection, query, where, getDocs, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // Data Lokasi
+        // Data Lokasi Surabaya
         const SURABAYA_LOCATIONS = [
             "(Asemrowo) Asemrowo", "(Asemrowo) Genting Kalianak", "(Asemrowo) Tambak Sarioso",
             "(Benowo) Kandangan", "(Benowo) Romokalisari", "(Benowo) Sememi", "(Benowo) Tambak Oso Wilangon",
@@ -124,7 +123,6 @@
             "LUAR SURABAYA"
         ];
 
-        // Autocomplete Logic
         function setupAutocomplete() {
             const input = document.getElementById('reg-domicile-input');
             const suggestionsBox = document.getElementById('domicile-suggestions');
@@ -158,7 +156,6 @@
             });
         }
 
-        // Global Window Functions untuk onClick
         window.toggleAuth = (t) => {
             document.getElementById('form-member').classList.toggle('hidden', t !== 'member');
             document.getElementById('form-gm').classList.toggle('hidden', t !== 'gm');
@@ -193,7 +190,6 @@
             btn.innerText = "Mendaftarkan...";
             
             try {
-                // Generate ID Unik: MS + 4 digit NIK terakhir + 4 digit timestamp terakhir
                 const id = `MS${nik.slice(-4)}${Date.now().toString().slice(-4)}`;
                 
                 await setDoc(doc(db, "users", id), { 
@@ -201,15 +197,13 @@
                     nik: nik, 
                     domicile: dom, 
                     whatsapp: wa, 
-                    points: 10, // Bonus awal
+                    points: 10, 
                     role: 'member', 
                     presence_count: 0 
                 });
                 
                 localStorage.setItem('ms_user_id', id); 
                 localStorage.setItem('ms_role', 'member'); 
-                
-                // PENTING: Redirect ke halaman Member
                 window.location.href = "member.html";
             } catch(e) { 
                 Swal.fire("Error", e.message, "error"); 
@@ -232,7 +226,6 @@
                 if(!snap.empty) { 
                     localStorage.setItem('ms_user_id', snap.docs[0].id); 
                     localStorage.setItem('ms_role', 'member'); 
-                    // PENTING: Redirect ke halaman Member
                     window.location.href = "member.html";
                 } else { 
                     Swal.fire("Gagal", "NIK tidak ditemukan, silakan mendaftar.", "error"); 
@@ -244,26 +237,53 @@
             }
         };
 
-        window.loginAdmin = () => {
+        // LOGIKA BARU: MULTI-ADMIN LOGIN
+        window.loginAdmin = async () => {
             const u = document.getElementById('gm-user').value;
             const p = document.getElementById('gm-pass').value;
+            const btn = document.querySelector('#form-gm button');
             
-            // Logika Auth Hardcode (Tetap sama seperti aslinya)
-            if(u === "supergm" && btoa(p) === "amFudWFyaTIwMjY=") { 
-                localStorage.setItem('ms_role', 'super_gm'); 
-                window.location.href = "gm.html"; // Redirect ke halaman GM
-            }
-            else if(u === "gmbiasa" && btoa(p) === "TUFUVVIyMDI2") { 
-                localStorage.setItem('ms_role', 'gm'); 
-                window.location.href = "gm.html"; // Redirect ke halaman GM
-            }
-            else {
-                Swal.fire("Akses Ditolak", "Username atau Password salah!", "error");
+            if (!u || !p) return Swal.fire("Gagal", "Username dan Password wajib diisi!", "warning");
+            
+            btn.innerText = "Memeriksa...";
+            
+            try {
+                // 1. Jalur Darurat: Super GM Pusat (Bawaan)
+                if(u === "supergm" && btoa(p) === "amFudWFyaTIwMjY=") { 
+                    localStorage.setItem('ms_role', 'super_gm'); 
+                    localStorage.setItem('ms_admin_name', 'Pusat Komando');
+                    localStorage.setItem('ms_admin_wa', '6281339760265'); // WA Admin Pusat
+                    window.location.href = "gm.html";
+                    return;
+                }
+                
+                // 2. Jalur Korlap: Cek di database 'admins'
+                const adminRef = doc(db, "admins", u);
+                const adminSnap = await getDoc(adminRef);
+                
+                if (adminSnap.exists()) {
+                    const data = adminSnap.data();
+                    // Pencocokan password
+                    if (data.password === p) {
+                        localStorage.setItem('ms_role', 'gm'); // Status Korlap Biasa
+                        localStorage.setItem('ms_admin_id', u); // Username mereka
+                        localStorage.setItem('ms_admin_name', data.name);
+                        localStorage.setItem('ms_admin_wa', data.wa);
+                        window.location.href = "gm.html";
+                    } else {
+                        Swal.fire("Ditolak", "Password salah!", "error");
+                    }
+                } else {
+                    Swal.fire("Ditolak", "Username Korlap tidak ditemukan!", "error");
+                }
+            } catch (e) {
+                Swal.fire("Error", "Gagal menghubungi server.", "error");
+                console.error(e);
+            } finally {
+                btn.innerText = "Login Console";
             }
         };
 
-        // --- SISTEM PENJAGA PINTU (ROUTER SEDERHANA) ---
-        // Mengecek apakah user sudah login sebelumnya
         function checkSession() {
             const role = localStorage.getItem('ms_role');
             if (role === 'member' && localStorage.getItem('ms_user_id')) {
@@ -271,12 +291,10 @@
             } else if (role === 'gm' || role === 'super_gm') {
                 window.location.href = "gm.html";
             } else {
-                // Jika tidak ada session, jalankan setup autocomplete form
                 setupAutocomplete();
             }
         }
 
-        // Jalankan pengecekan saat halaman dimuat
         checkSession();
         
     </script>
