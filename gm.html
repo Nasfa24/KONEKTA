@@ -334,7 +334,14 @@
         };
 
         function loadActiveLocations() {
-            const q = query(collection(db, "active_events"), where("status", "==", "active"));
+            // LOGIKA ISOLASI: Super GM lihat semua, Korlap lihat miliknya saja
+            let q;
+            if (role === 'super_gm') {
+                q = query(collection(db, "active_events"), where("status", "==", "active"));
+            } else {
+                q = query(collection(db, "active_events"), where("status", "==", "active"), where("creator", "==", adminName));
+            }
+
             onSnapshot(q, (snap) => {
                 const list = document.getElementById('active-locations-list');
                 list.innerHTML = snap.empty ? '<p class="text-center py-8 text-[10px] text-gray-300 font-bold uppercase tracking-widest border-2 border-dashed border-gray-200 rounded-3xl">Tidak ada lokasi aktif</p>' : '';
@@ -444,7 +451,14 @@
             document.getElementById('active-locations-list').classList.add('hidden');
             
             try {
-                const q = query(collection(db, "active_events"), where("status", "==", "ended"), limit(20));
+                // LOGIKA ISOLASI: Arsip Super GM lihat semua, Arsip Korlap lihat miliknya saja
+                let q;
+                if (role === 'super_gm') {
+                    q = query(collection(db, "active_events"), where("status", "==", "ended"), limit(20));
+                } else {
+                    q = query(collection(db, "active_events"), where("status", "==", "ended"), where("creator", "==", adminName), limit(20));
+                }
+
                 const snap = await getDocs(q);
                 
                 if (snap.empty) {
