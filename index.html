@@ -12,6 +12,11 @@
     <meta property="og:image" content="https://appkonekta.fun/logo.png"> 
     
     <link rel="icon" href="logo.png" type="image/png">
+
+    <!-- Konfigurasi PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f766e">
+    <link rel="apple-touch-icon" href="logo.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -297,6 +302,21 @@
 
         checkSession();
         
+    </script>
+
+    <!-- Script PWA: Mendaftarkan Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker sukses didaftarkan dengan scope: ', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('ServiceWorker gagal didaftarkan: ', error);
+                    });
+            });
+        }
     </script>
 </body>
 </html>

@@ -1,21 +1,22 @@
 {
-  "name": "Community Reward System",
-  "short_name": "CommReward",
-  "description": "Framework Komunitas Sosial Berbasis Teknologi",
-  "start_url": "/index.html",
+  "name": "KONEKTA - Terhubung Lebih Dekat",
+  "short_name": "KONEKTA",
+  "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#2563eb",
-  "theme_color": "#2563eb",
+  "background_color": "#f0fdf4",
+  "theme_color": "#0f766e",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3003/3003230.png",
+      "src": "logo.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3003/3003230.png",
+      "src": "logo.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
