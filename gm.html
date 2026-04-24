@@ -33,7 +33,7 @@
     <div class="p-5 max-w-md mx-auto text-center">
         <div class="flex justify-between items-center mb-6 px-2 pt-4">
             <div class="flex items-center gap-3">
-                <img src="https://appkonekta.fun/logo.png" alt="Logo" class="w-12 h-auto object-contain" onerror="this.style.display='none'">
+                <img src="logo.png" alt="Logo" class="w-12 h-auto object-contain" onerror="this.style.display='none'">
                 <div>
                     <h2 class="text-2xl font-black uppercase text-[#0f766e] tracking-tighter text-left">KONEKTA</h2>
                     <p id="admin-greeting" class="text-[9px] font-bold text-gray-400 uppercase tracking-widest text-left">Console Admin</p>
@@ -126,7 +126,7 @@
                 <p class="text-[10px] text-gray-400 mb-4 italic font-bold">Konektor Scan QR di atas, ATAU</p>
                 
                 <button onclick="openGMScannerMode()" class="w-full bg-gray-900 text-white py-4 rounded-2xl font-black uppercase shadow-lg mb-2 flex justify-center items-center gap-3 active:scale-95 hover:bg-gray-800 transition-colors">
-                    <span class="text-xl">📷</span> <span class="text-[10px] tracking-widest">Scan QR Konektor</span>
+                    <span class="text-xl">📷</span> <span class="text-[10px] tracking-widest">Scan QR NIK Konektor</span>
                 </button>
                 <button id="btn-view-attendees" onclick="openAttendeeList()" class="w-full bg-teal-50 text-teal-700 border border-teal-100 py-3 rounded-2xl font-black uppercase shadow-sm mb-4 flex justify-center items-center gap-2 active:scale-95 hover:bg-teal-100 transition-colors">
                     <span class="text-lg">👥</span> <span class="text-[10px] tracking-widest">Lihat Data Peserta</span>
@@ -210,9 +210,10 @@
         </div>
     </div>
 
-    <script type="module">
-        import { db } from './firebase-config.js';
-        import { doc, getDoc, updateDoc, increment, setDoc, collection, query, where, orderBy, limit, getDocs, onSnapshot, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    <script>
+        const SUPABASE_URL = "https://hvbrskchlpemypawpqjn.supabase.co/rest/v1";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2YnJza2NobHBlbXlwYXdwcWpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzYzNzksImV4cCI6MjA5MjUxMjM3OX0.0NCroyTHROeQ3SNKOTNZS1H1hxrGy5wGTLGWm5YdOdo"; 
+        const headersSupa = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
 
         const role = localStorage.getItem('ms_role');
         const adminName = localStorage.getItem('ms_admin_name') || 'Admin';
@@ -222,29 +223,27 @@
             window.location.href = "index.html";
         }
 
-        // Tampilkan Identitas Admin
         document.getElementById('admin-greeting').innerText = `Halo, ${adminName}`;
         document.getElementById('creator-display-name').innerText = adminName;
 
-        // Otoritas Khusus Super GM
         if (role === 'super_gm') {
             document.getElementById('super-stats').classList.remove('hidden');
             document.getElementById('btn-view-archive').classList.remove('hidden');
-            document.getElementById('nav-gm-korlap').classList.remove('hidden'); // Tampilkan tab Korlap
+            document.getElementById('nav-gm-korlap').classList.remove('hidden'); 
         }
         
         let html5QrCode = null;
         let currentSelectedEventId = null;
         let currentAttendeeData = [];
 
-        // Hitung Total Member
         if(role === 'super_gm') {
-            getDocs(query(collection(db, "users"), where("role", "==", "member"))).then(snap => {
-                document.getElementById('total-members').innerText = snap.size;
+            fetch(`${SUPABASE_URL}/master_kader?select=nik`, { method: 'HEAD', headers: headersSupa })
+            .then(res => {
+                let range = res.headers.get('content-range');
+                document.getElementById('total-members').innerText = range ? range.split('/')[1] : 0;
             }).catch(e => console.log(e));
         }
 
-        // --- NAVIGATION LOGIC ---
         window.showGMSection = (s) => {
             document.getElementById('gm-section-event').classList.toggle('hidden', s !== 'event');
             document.getElementById('gm-section-orders').classList.toggle('hidden', s !== 'orders');
@@ -293,8 +292,6 @@
             });
         };
 
-        // --- EVENT MANAGEMENT LOGIC ---
-
         window.buatEventBaru = async () => {
             const btn = document.getElementById('btn-submit-event');
             const cooldownMins = parseInt(document.getElementById('ev-cooldown').value);
@@ -317,48 +314,47 @@
             const eventId = "EVT" + Date.now();
             
             try {
-                await setDoc(doc(db, "active_events", eventId), { 
-                    name: document.getElementById('ev-name').value, 
-                    date: document.getElementById('ev-date').value, 
-                    location: document.getElementById('ev-loc').value, 
-                    creator: adminName, // Otomatis dari sistem
-                    creatorWA: adminWA.startsWith('0') ? '62' + adminWA.slice(1) : adminWA, 
-                    points: parseInt(document.getElementById('ev-points').value), 
-                    status: 'active', 
-                    id: eventId,
-                    createdAt: Date.now()
+                await fetch(`${SUPABASE_URL}/konekta_events`, {
+                    method: 'POST', headers: headersSupa, 
+                    body: JSON.stringify({ 
+                        id: eventId,
+                        name: document.getElementById('ev-name').value, 
+                        date: document.getElementById('ev-date').value, 
+                        location: document.getElementById('ev-loc').value, 
+                        creator: adminName, 
+                        creator_wa: adminWA.startsWith('0') ? '62' + adminWA.slice(1) : adminWA, 
+                        points: parseInt(document.getElementById('ev-points').value), 
+                        status: 'active', 
+                        created_at: Date.now()
+                    })
                 });
                 
                 localStorage.setItem('gm_last_created_time', Date.now().toString());
                 Swal.fire("Sukses", "Event Berhasil Dibuat! (Otomatis tutup dalam 3 jam)", "success").then(() => location.reload());
             } catch (e) { 
-                Swal.fire("Error", e.message, "error"); 
+                Swal.fire("Error", "Gagal menghubungi server", "error"); 
                 btn.innerText = "AKTIFKAN SEKARANG"; 
             }
         };
 
-        function loadActiveLocations() {
-            // LOGIKA ISOLASI: Super GM lihat semua, Korlap lihat miliknya saja
-            let q;
-            if (role === 'super_gm') {
-                q = query(collection(db, "active_events"), where("status", "==", "active"));
-            } else {
-                q = query(collection(db, "active_events"), where("status", "==", "active"), where("creator", "==", adminName));
-            }
+        async function loadActiveLocations() {
+            let url = `${SUPABASE_URL}/konekta_events?status=eq.active`;
+            if (role !== 'super_gm') url += `&creator=eq.${encodeURIComponent(adminName)}`;
 
-            onSnapshot(q, (snap) => {
-                const list = document.getElementById('active-locations-list');
-                list.innerHTML = snap.empty ? '<p class="text-center py-8 text-[10px] text-gray-300 font-bold uppercase tracking-widest border-2 border-dashed border-gray-200 rounded-3xl">Tidak ada lokasi aktif</p>' : '';
+            try {
+                const res = await fetch(url, { headers: headersSupa });
+                const data = await res.json();
                 
-                snap.forEach(async (d) => {
-                    const ev = d.data();
-                    
-                    if (ev.createdAt && (Date.now() - ev.createdAt > 10800000)) {
-                        await updateDoc(doc(db, "active_events", ev.id), { status: 'ended' });
+                const list = document.getElementById('active-locations-list');
+                list.innerHTML = data.length === 0 ? '<p class="text-center py-8 text-[10px] text-gray-300 font-bold uppercase tracking-widest border-2 border-dashed border-gray-200 rounded-3xl">Tidak ada lokasi aktif</p>' : '';
+                
+                data.forEach(async (ev) => {
+                    if (ev.created_at && (Date.now() - ev.created_at > 10800000)) {
+                        await fetch(`${SUPABASE_URL}/konekta_events?id=eq.${ev.id}`, { method: 'PATCH', headers: headersSupa, body: JSON.stringify({ status: 'ended' }) });
                         return;
                     }
 
-                    const waLink = `https://wa.me/${ev.creatorWA}?text=${encodeURIComponent(`Konfirmasi Event: ${ev.name} di ${ev.location}`)}`;
+                    const waLink = `https://wa.me/${ev.creator_wa}?text=${encodeURIComponent(`Konfirmasi Event: ${ev.name} di ${ev.location}`)}`;
                     let auditHTML = role === 'super_gm' ? `<a href="${waLink}" target="_blank" onclick="event.stopPropagation()" class="block w-full text-center bg-red-50 text-red-600 font-black text-[10px] uppercase py-2 rounded-xl mt-3 border border-red-100 hover:bg-red-100 transition-colors">👮 Konfirmasi / Audit GM</a>` : '';
 
                     list.innerHTML += `
@@ -374,7 +370,7 @@
                         ${auditHTML}
                     </div>`;
                 });
-            });
+            } catch (e) { console.error(e); }
         }
 
         window.selectLocation = async (eventId) => {
@@ -382,10 +378,11 @@
             Swal.fire({ title: 'Memuat...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
             
             try {
-                const evSnap = await getDoc(doc(db, "active_events", eventId));
+                const res = await fetch(`${SUPABASE_URL}/konekta_events?id=eq.${eventId}`, { headers: headersSupa });
+                const data = await res.json();
                 Swal.close();
-                if(evSnap.exists()) {
-                    const d = evSnap.data();
+                if(data.length > 0) {
+                    const d = data[0];
                     document.getElementById('gm-event-selector').classList.add('hidden');
                     document.getElementById('gm-active-display').classList.remove('hidden');
                     
@@ -405,13 +402,15 @@
                         btnEnd.innerText = "Event Selesai"; 
                         btnEnd.onclick = () => {
                             Swal.fire({ title: 'Akhiri Event?', icon: 'question', showCancelButton: true, confirmButtonText: 'Ya' }).then(r => { 
-                                if(r.isConfirmed) updateDoc(doc(db, "active_events", eventId), { status: 'ended' }).then(() => location.reload()); 
+                                if(r.isConfirmed) {
+                                    fetch(`${SUPABASE_URL}/konekta_events?id=eq.${eventId}`, { method: 'PATCH', headers: headersSupa, body: JSON.stringify({ status: 'ended' }) }).then(() => location.reload());
+                                } 
                             });
                         };
                     }
                 }
             } catch (e) {
-                Swal.fire("Error", e.message, "error");
+                Swal.fire("Error", "Koneksi terputus.", "error");
             }
         };
 
@@ -427,18 +426,23 @@
                 if(r.isConfirmed) {
                     Swal.fire({ title: 'Menarik Poin...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
                     try {
-                        const evSnap = await getDoc(doc(db, "active_events", currentSelectedEventId));
-                        const pts = evSnap.data().points;
+                        const resEv = await fetch(`${SUPABASE_URL}/konekta_events?id=eq.${currentSelectedEventId}`, { headers: headersSupa });
+                        const evData = await resEv.json();
+                        const pts = evData[0].points;
                         
-                        const hSnap = await getDocs(query(collection(db, "history"), where("activityId", "==", currentSelectedEventId)));
+                        const resH = await fetch(`${SUPABASE_URL}/konekta_history?activity_id=eq.${currentSelectedEventId}`, { headers: headersSupa });
+                        const histData = await resH.json();
                         
-                        const updatePromises = hSnap.docs.map(async h => {
-                            await updateDoc(doc(db, "users", h.data().userId), { points: increment(-pts), presence_count: increment(-1) });
-                            await deleteDoc(h.ref);
-                        });
+                        for (const h of histData) {
+                            const uRes = await fetch(`${SUPABASE_URL}/master_kader?nik=eq.${h.user_id}&select=konekta_points`, { headers: headersSupa });
+                            const uData = await uRes.json();
+                            const currentPts = uData[0].konekta_points || 0;
+                            
+                            await fetch(`${SUPABASE_URL}/master_kader?nik=eq.${h.user_id}`, { method: 'PATCH', headers: headersSupa, body: JSON.stringify({ konekta_points: currentPts - pts }) });
+                            await fetch(`${SUPABASE_URL}/konekta_history?id=eq.${h.id}`, { method: 'DELETE', headers: headersSupa });
+                        }
                         
-                        await Promise.all(updatePromises);
-                        await updateDoc(doc(db, "active_events", currentSelectedEventId), { status: 'deleted' });
+                        await fetch(`${SUPABASE_URL}/konekta_events?id=eq.${currentSelectedEventId}`, { method: 'PATCH', headers: headersSupa, body: JSON.stringify({ status: 'deleted' }) });
                         
                         Swal.fire("Selesai", "Event dihapus & Poin ditarik.", "success").then(() => location.reload());
                     } catch (e) {
@@ -455,25 +459,20 @@
             document.getElementById('active-locations-list').classList.add('hidden');
             
             try {
-                // LOGIKA ISOLASI: Arsip Super GM lihat semua, Arsip Korlap lihat miliknya saja
-                let q;
-                if (role === 'super_gm') {
-                    q = query(collection(db, "active_events"), where("status", "==", "ended"), limit(20));
-                } else {
-                    q = query(collection(db, "active_events"), where("status", "==", "ended"), where("creator", "==", adminName), limit(20));
-                }
+                let url = `${SUPABASE_URL}/konekta_events?status=eq.ended&order=created_at.desc&limit=20`;
+                if (role !== 'super_gm') url += `&creator=eq.${encodeURIComponent(adminName)}`;
 
-                const snap = await getDocs(q);
+                const res = await fetch(url, { headers: headersSupa });
+                const data = await res.json();
                 
-                if (snap.empty) {
+                if (data.length === 0) {
                     list.innerHTML = '<p class="text-center py-4 text-[10px] text-gray-400 italic">Belum ada event selesai.</p>';
                     return;
                 }
                 
                 list.innerHTML = '';
-                snap.forEach(d => {
-                    const ev = d.data();
-                    let auditBtn = ev.creatorWA ? `<a href="https://wa.me/${ev.creatorWA}?text=Audit%20Event%20${encodeURIComponent(ev.name)}" target="_blank" class="block text-center mt-2 text-[8px] font-black text-red-500 uppercase hover:underline">👮 Audit WA</a>` : '';
+                data.forEach(ev => {
+                    let auditBtn = ev.creator_wa ? `<a href="https://wa.me/${ev.creator_wa}?text=Audit%20Event%20${encodeURIComponent(ev.name)}" target="_blank" class="block text-center mt-2 text-[8px] font-black text-red-500 uppercase hover:underline">👮 Audit WA</a>` : '';
                     
                     list.innerHTML += `
                     <div class="w-full bg-gray-50 p-4 rounded-2xl border border-gray-200 mb-2 hover:bg-gray-100 transition-colors">
@@ -488,9 +487,7 @@
                         ${auditBtn}
                     </div>`;
                 });
-            } catch (e) {
-                console.error(e);
-            }
+            } catch (e) { console.error(e); }
         };
 
         // --- ATTENDEE & REGION STATS ---
@@ -505,18 +502,18 @@
             currentAttendeeData = [];
             
             try {
-                const q = query(collection(db, "history"), where("activityId", "==", currentSelectedEventId));
-                const snap = await getDocs(q);
+                const res = await fetch(`${SUPABASE_URL}/konekta_history?activity_id=eq.${currentSelectedEventId}`, { headers: headersSupa });
+                const data = await res.json();
                 
-                document.getElementById('attendee-count').innerText = `${snap.size} Peserta`;
+                document.getElementById('attendee-count').innerText = `${data.length} Peserta`;
                 
-                if (snap.empty) { 
+                if (data.length === 0) { 
                     tbody.innerHTML = `<tr><td colspan="2" class="p-6 text-center text-gray-400 italic text-[10px]">Belum ada yang absen.</td></tr>`; 
                 } else {
-                    currentAttendeeData = snap.docs.map(d => ({ 
-                        name: d.data().userName || "N/A", 
-                        nik: d.data().userNik || "N/A", 
-                        fullTime: new Date(d.data().date?.seconds*1000 || Date.now()).toLocaleString() 
+                    currentAttendeeData = data.map(d => ({ 
+                        name: d.user_name || "N/A", 
+                        nik: d.user_id || "N/A", 
+                        fullTime: new Date(d.date).toLocaleString() 
                     }));
                     
                     currentAttendeeData.forEach(p => { 
@@ -529,7 +526,7 @@
                 }
                 document.getElementById('attendee-modal').classList.remove('hidden');
             } catch (e) { 
-                Swal.fire("Error", e.message, "error"); 
+                Swal.fire("Error", "Gagal memuat peserta", "error"); 
             } finally { 
                 btn.innerHTML = originalHTML; 
             }
@@ -560,12 +557,12 @@
             btn.innerText = "Memuat...";
             
             try {
-                const snap = await getDocs(query(collection(db, "users"), where("role", "==", "member")));
+                const res = await fetch(`${SUPABASE_URL}/master_kader?konekta_points=gt.0&select=domisili`, { headers: headersSupa });
+                const data = await res.json();
                 const regionCounts = {};
                 
-                snap.forEach(doc => { 
-                    const d = doc.data(); 
-                    const dom = d.domicile ? (d.domicile.includes(') ') ? d.domicile.split(') ')[1] : d.domicile) : "Tidak Diketahui"; 
+                data.forEach(d => { 
+                    const dom = d.domisili ? (d.domisili.includes(') ') ? d.domisili.split(') ')[1] : d.domisili) : "Tidak Diketahui"; 
                     regionCounts[dom] = (regionCounts[dom] || 0) + 1; 
                 });
                 
@@ -586,7 +583,7 @@
                 
                 document.getElementById('region-stats-modal').classList.remove('hidden');
             } catch (error) { 
-                Swal.fire("Error", error.message, "error"); 
+                Swal.fire("Error", "Gagal memuat region", "error"); 
             } finally { 
                 btn.innerText = originalText; 
             }
@@ -604,7 +601,7 @@
                 document.getElementById('scanner-modal').classList.add('hidden');
                 
                 if (txt.toLowerCase().startsWith("http") || txt.toLowerCase().startsWith("www")) {
-                    return Swal.fire("Salah QR", "Jangan scan link web. Scan QR ID Konektor!", "warning"); 
+                    return Swal.fire("Salah QR", "Jangan scan link web. Scan QR NIK Konektor!", "warning"); 
                 }
                 await processGmScan(txt);
             });
@@ -616,35 +613,40 @@
         };
 
         async function processGmScan(mid) {
-            if (!mid.includes("MS")) return Swal.fire("Gagal", "QR Code tidak valid! Pastikan itu QR ID Konektor.", "error");
-            
             Swal.fire({ title: 'Mengecek User...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
             
             try {
-                const evSnap = await getDoc(doc(db, "active_events", currentSelectedEventId));
-                const mRef = doc(db, "users", mid);
-                const mSnap = await getDoc(mRef);
+                const resEv = await fetch(`${SUPABASE_URL}/konekta_events?id=eq.${currentSelectedEventId}`, { headers: headersSupa });
+                const evData = await resEv.json();
                 
-                if(!mSnap.exists()) return Swal.fire("Gagal", "Konektor tidak ditemukan di database", "error");
+                const resU = await fetch(`${SUPABASE_URL}/master_kader?nik=eq.${mid}`, { headers: headersSupa });
+                const uData = await resU.json();
                 
-                const logId = `${mid}_${evSnap.id}`;
-                const logCheck = await getDoc(doc(db, "history", logId));
+                if(uData.length === 0) return Swal.fire("Gagal", "Konektor tidak ditemukan di database", "error");
                 
-                if(logCheck.exists()) return Swal.fire("Info", "Konektor ini sudah diabsen sebelumnya.", "warning");
+                const logId = `${mid}_${currentSelectedEventId}`;
+                const resH = await fetch(`${SUPABASE_URL}/konekta_history?id=eq.${logId}`, { headers: headersSupa });
+                const histData = await resH.json();
                 
-                await updateDoc(mRef, { points: increment(evSnap.data().points), presence_count: increment(1) });
-                await setDoc(doc(db, "history", logId), { 
-                    userId: mid, 
-                    userName: mSnap.data().name, 
-                    userNik: mSnap.data().nik, 
-                    activityId: evSnap.id, 
-                    activity: `Hadir (Manual): ${evSnap.data().name}`, 
-                    points: evSnap.data().points, 
-                    date: serverTimestamp(), 
-                    eventDate: evSnap.data().date 
-                });
+                if(histData.length > 0) return Swal.fire("Info", "Konektor ini sudah diabsen sebelumnya.", "warning");
                 
-                Swal.fire("Sukses", `Absen masuk untuk:\n${mSnap.data().name}`, "success");
+                const currentPts = uData[0].konekta_points || 0;
+
+                // Update Points
+                await fetch(`${SUPABASE_URL}/master_kader?nik=eq.${mid}`, { method: 'PATCH', headers: headersSupa, body: JSON.stringify({ konekta_points: currentPts + evData[0].points }) });
+                
+                // Add History
+                await fetch(`${SUPABASE_URL}/konekta_history`, { method: 'POST', headers: headersSupa, body: JSON.stringify({ 
+                    id: logId,
+                    user_id: mid, 
+                    user_name: uData[0].nama, 
+                    activity_id: evData[0].id, 
+                    activity: `Hadir (Manual): ${evData[0].name}`, 
+                    points: evData[0].points, 
+                    event_date: evData[0].date 
+                })});
+                
+                Swal.fire("Sukses", `Absen masuk untuk:\n${uData[0].nama}`, "success");
             } catch (e) {
                 Swal.fire("Error", "Gagal memproses absen manual.", "error");
             }
@@ -652,12 +654,14 @@
 
         // --- REDEEM ORDERS LOGIC ---
 
-        function loadRedeemOrders() {
-            const q = query(collection(db, "redeem_orders"), where("status", "==", "pending"), orderBy("date", "asc"));
-            onSnapshot(q, (snap) => {
+        async function loadRedeemOrders() {
+            try {
+                const res = await fetch(`${SUPABASE_URL}/konekta_redeems?status=eq.pending&order=date.asc`, { headers: headersSupa });
+                const dataList = await res.json();
+
                 const list = document.getElementById('gm-order-list');
                 
-                if (snap.empty) {
+                if (dataList.length === 0) {
                     list.innerHTML = `
                     <div class="flex flex-col items-center justify-center py-10 text-gray-400">
                         <span class="text-3xl mb-2">☕</span>
@@ -667,23 +671,23 @@
                 }
                 
                 list.innerHTML = '';
-                snap.forEach(d => {
-                    const o = d.data();
-                    let msg = `Halo Konektor *${o.userName}*, konfirmasi pengajuan *${o.itemName}* untuk ditransfer ke rekening/e-wallet *${o.targetInfo}* valid?`;
-                    const wa = `https://wa.me/${o.userWA}?text=${encodeURIComponent(msg)}`;
+                dataList.forEach(o => {
+                    let msg = `Halo Konektor *${o.user_name}*, konfirmasi pengajuan *${o.item_name}* untuk ditransfer ke rekening/e-wallet *${o.target_info}* valid?`;
+                    let waFormatted = o.user_wa.startsWith('0') ? '62' + o.user_wa.slice(1) : o.user_wa;
+                    const wa = `https://wa.me/${waFormatted}?text=${encodeURIComponent(msg)}`;
                     
                     list.innerHTML += `
-                    <div class="bg-white p-5 rounded-3xl border border-gray-100 mb-3 shadow-sm hover:shadow-md transition-shadow">
-                        <p class="text-[11px] font-black uppercase text-teal-700">${o.userName}</p>
-                        <p class="text-[10px] text-gray-500 font-bold mt-1">${o.itemName}</p>
-                        <div class="bg-gray-50 p-3 rounded-xl text-[10px] italic my-3 text-gray-600 border border-gray-200">${o.targetInfo}</div>
+                    <div class="bg-white p-5 rounded-3xl border border-gray-100 mb-3 shadow-sm hover:shadow-md transition-shadow text-left">
+                        <p class="text-[11px] font-black uppercase text-teal-700">${o.user_name}</p>
+                        <p class="text-[10px] text-gray-500 font-bold mt-1">${o.item_name}</p>
+                        <div class="bg-gray-50 p-3 rounded-xl text-[10px] italic my-3 text-gray-600 border border-gray-200">${o.target_info}</div>
                         <div class="flex gap-2">
                             <a href="${wa}" target="_blank" class="flex-1 bg-emerald-50 text-emerald-600 py-3 rounded-xl text-[9px] font-black uppercase border border-emerald-100 block text-center hover:bg-emerald-100 transition-colors">Chat WA</a>
-                            <button onclick="completeOrder('${d.id}')" class="flex-1 bg-gray-800 text-white py-3 rounded-xl text-[9px] font-black uppercase shadow-md active:scale-95 hover:bg-gray-900 transition-colors">Tandai Selesai</button>
+                            <button onclick="completeOrder('${o.id}')" class="flex-1 bg-gray-800 text-white py-3 rounded-xl text-[9px] font-black uppercase shadow-md active:scale-95 hover:bg-gray-900 transition-colors">Tandai Selesai</button>
                         </div>
                     </div>`;
                 });
-            });
+            } catch(e) { console.error(e); }
         }
 
         window.completeOrder = async (id) => {
@@ -697,8 +701,9 @@
             }).then(async r => {
                 if(r.isConfirmed) {
                     try {
-                        await updateDoc(doc(db, "redeem_orders", id), { status: 'completed' });
+                        await fetch(`${SUPABASE_URL}/konekta_redeems?id=eq.${id}`, { method: 'PATCH', headers: headersSupa, body: JSON.stringify({ status: 'completed' }) });
                         Swal.fire("Sukses", "Pencairan dana berhasil ditandai selesai.", "success");
+                        loadRedeemOrders();
                     } catch (e) {
                         Swal.fire("Error", "Gagal mengupdate status.", "error");
                     }
@@ -718,18 +723,18 @@
             
             btn.innerText = "Menyimpan...";
             try {
-                // Simpan ke collection 'admins'
-                await setDoc(doc(db, "admins", u), {
-                    name: n,
-                    wa: wa.startsWith('0') ? '62' + wa.slice(1) : wa,
-                    password: p,
-                    role: 'gm',
-                    createdAt: serverTimestamp()
+                await fetch(`${SUPABASE_URL}/konekta_admins`, {
+                    method: 'POST', headers: headersSupa, body: JSON.stringify({
+                        id: u,
+                        name: n,
+                        wa: wa.startsWith('0') ? '62' + wa.slice(1) : wa,
+                        password: p,
+                        role: 'gm'
+                    })
                 });
                 
                 Swal.fire("Sukses", `Akun Korlap ${n} berhasil dibuat!\nUsername: ${u}\nPassword: ${p}`, "success");
                 
-                // Kosongkan form
                 document.getElementById('korlap-user').value = '';
                 document.getElementById('korlap-pass').value = '';
                 document.getElementById('korlap-name').value = '';
@@ -741,23 +746,14 @@
             }
         };
 
-        // Initialize active locations on load
+        // Auto Refresh Locations
+        setInterval(() => {
+            if(document.getElementById('gm-section-event').classList.contains('hidden') === false && document.getElementById('gm-event-selector').classList.contains('hidden') === false) {
+                loadActiveLocations();
+            }
+        }, 15000);
         loadActiveLocations();
 
-    </script>
-    
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(registration => {
-                        console.log('ServiceWorker sukses didaftarkan dengan scope: ', registration.scope);
-                    })
-                    .catch(error => {
-                        console.log('ServiceWorker gagal didaftarkan: ', error);
-                    });
-            });
-        }
     </script>
 </body>
 </html>

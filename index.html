@@ -13,7 +13,6 @@
     
     <link rel="icon" href="logo.png" type="image/png">
 
-    <!-- Konfigurasi PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f766e">
     <link rel="apple-touch-icon" href="logo.png">
@@ -45,7 +44,7 @@
 
     <div id="tab-awal" class="p-6 w-full max-w-md mx-auto text-center">
         <div class="mb-10 pt-4 flex flex-col items-center">
-            <img src="https://appkonekta.fun/logo.png" alt="Logo KONEKTA" class="w-24 h-auto mb-4 object-contain drop-shadow-sm" onerror="this.style.display='none'">
+            <img src="logo.png" alt="Logo KONEKTA" class="w-24 h-auto mb-4 object-contain drop-shadow-sm" onerror="this.style.display='none'">
             <h1 class="text-5xl font-black text-[#0f766e] tracking-tighter mb-2">KONEKTA</h1>
             <p class="text-gray-500 text-sm font-medium tracking-widest uppercase">Terhubung Lebih Dekat</p>
         </div>
@@ -86,13 +85,12 @@
         </div>
     </div>
 
-    <script type="module">
-        import { db } from './firebase-config.js';
-        
-        // Tambahkan getDoc untuk mengecek database admin
-        import { doc, getDoc, setDoc, collection, query, where, getDocs, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    <script>
+        // KREDENSIAL SUPABASE
+        const SUPABASE_URL = "https://hvbrskchlpemypawpqjn.supabase.co/rest/v1";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2YnJza2NobHBlbXlwYXdwcWpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzYzNzksImV4cCI6MjA5MjUxMjM3OX0.0NCroyTHROeQ3SNKOTNZS1H1hxrGy5wGTLGWm5YdOdo"; 
+        const headersSupa = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
 
-        // Data Lokasi Surabaya
         const SURABAYA_LOCATIONS = [
             "(Asemrowo) Asemrowo", "(Asemrowo) Genting Kalianak", "(Asemrowo) Tambak Sarioso",
             "(Benowo) Kandangan", "(Benowo) Romokalisari", "(Benowo) Sememi", "(Benowo) Tambak Oso Wilangon",
@@ -195,23 +193,32 @@
             btn.innerText = "Mendaftarkan...";
             
             try {
-                const id = `MS${nik.slice(-4)}${Date.now().toString().slice(-4)}`;
+                // Cek eksistensi NIK di Supabase master_kader
+                const res = await fetch(`${SUPABASE_URL}/master_kader?nik=eq.${nik}&select=nik`, { headers: headersSupa });
+                const existing = await res.json();
+
+                if(existing.length > 0) {
+                    // Update jika kader LPP/Lebah Kreatif sudah ada
+                    await fetch(`${SUPABASE_URL}/master_kader?nik=eq.${nik}`, {
+                        method: 'PATCH', headers: headersSupa, 
+                        body: JSON.stringify({ domisili: dom, konekta_points: 10, konekta_presence_count: 0 })
+                    });
+                } else {
+                    // Insert baru
+                    await fetch(`${SUPABASE_URL}/master_kader`, {
+                        method: 'POST', headers: headersSupa, 
+                        body: JSON.stringify({ 
+                            nik: nik, nama: n, no_whatsapp: wa, domisili: dom, 
+                            konekta_points: 10, konekta_presence_count: 0 
+                        })
+                    });
+                }
                 
-                await setDoc(doc(db, "users", id), { 
-                    name: n, 
-                    nik: nik, 
-                    domicile: dom, 
-                    whatsapp: wa, 
-                    points: 10, 
-                    role: 'member', 
-                    presence_count: 0 
-                });
-                
-                localStorage.setItem('ms_user_id', id); 
+                localStorage.setItem('ms_user_id', nik); 
                 localStorage.setItem('ms_role', 'member'); 
                 window.location.href = "member.html";
             } catch(e) { 
-                Swal.fire("Error", e.message, "error"); 
+                Swal.fire("Error", "Gagal mendaftar. Cek koneksi internet.", "error"); 
                 btn.innerText = "Gabung Jadi Konektor";
             }
         };
@@ -225,24 +232,23 @@
             btn.innerText = "Mencari Data...";
             
             try {
-                const q = query(collection(db, "users"), where("nik", "==", nik), limit(1));
-                const snap = await getDocs(q);
+                const res = await fetch(`${SUPABASE_URL}/master_kader?nik=eq.${nik}&select=nik`, { headers: headersSupa });
+                const snap = await res.json();
                 
-                if(!snap.empty) { 
-                    localStorage.setItem('ms_user_id', snap.docs[0].id); 
+                if(snap.length > 0) { 
+                    localStorage.setItem('ms_user_id', nik); 
                     localStorage.setItem('ms_role', 'member'); 
                     window.location.href = "member.html";
                 } else { 
                     Swal.fire("Gagal", "NIK tidak ditemukan, silakan mendaftar.", "error"); 
                 }
             } catch(e) {
-                Swal.fire("Error", e.message, "error");
+                Swal.fire("Error", "Gagal menghubungi server.", "error");
             } finally {
                 btn.innerText = "Masuk Aplikasi";
             }
         };
 
-        // LOGIKA BARU: MULTI-ADMIN LOGIN
         window.loginAdmin = async () => {
             const u = document.getElementById('gm-user').value;
             const p = document.getElementById('gm-pass').value;
@@ -253,27 +259,23 @@
             btn.innerText = "Memeriksa...";
             
             try {
-                // 1. Jalur Darurat: Super GM Pusat (Bawaan)
                 if(u === "supergm" && btoa(p) === "amFudWFyaTIwMjY=") { 
                     localStorage.setItem('ms_role', 'super_gm'); 
                     localStorage.setItem('ms_admin_name', 'Pusat Komando');
-                    localStorage.setItem('ms_admin_wa', '6281339760265'); // WA Admin Pusat
+                    localStorage.setItem('ms_admin_wa', '6281339760265'); 
                     window.location.href = "gm.html";
                     return;
                 }
                 
-                // 2. Jalur Korlap: Cek di database 'admins'
-                const adminRef = doc(db, "admins", u);
-                const adminSnap = await getDoc(adminRef);
+                const res = await fetch(`${SUPABASE_URL}/konekta_admins?id=eq.${u}&select=*`, { headers: headersSupa });
+                const data = await res.json();
                 
-                if (adminSnap.exists()) {
-                    const data = adminSnap.data();
-                    // Pencocokan password
-                    if (data.password === p) {
-                        localStorage.setItem('ms_role', 'gm'); // Status Korlap Biasa
-                        localStorage.setItem('ms_admin_id', u); // Username mereka
-                        localStorage.setItem('ms_admin_name', data.name);
-                        localStorage.setItem('ms_admin_wa', data.wa);
+                if (data.length > 0) {
+                    if (data[0].password === p) {
+                        localStorage.setItem('ms_role', 'gm'); 
+                        localStorage.setItem('ms_admin_id', u); 
+                        localStorage.setItem('ms_admin_name', data[0].name);
+                        localStorage.setItem('ms_admin_wa', data[0].wa);
                         window.location.href = "gm.html";
                     } else {
                         Swal.fire("Ditolak", "Password salah!", "error");
@@ -283,7 +285,6 @@
                 }
             } catch (e) {
                 Swal.fire("Error", "Gagal menghubungi server.", "error");
-                console.error(e);
             } finally {
                 btn.innerText = "Login Console";
             }
@@ -304,14 +305,10 @@
         
     </script>
 
-    <!-- Script PWA: Mendaftarkan Service Worker -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js')
-                    .then(registration => {
-                        console.log('ServiceWorker sukses didaftarkan dengan scope: ', registration.scope);
-                    })
                     .catch(error => {
                         console.log('ServiceWorker gagal didaftarkan: ', error);
                     });

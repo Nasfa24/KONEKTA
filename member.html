@@ -102,12 +102,13 @@
         </div>
     </div>
 
-    <script type="module">
-        import { db } from './firebase-config.js';
-        import { doc, getDoc, updateDoc, increment, collection, addDoc, query, where, orderBy, limit, getDocs, onSnapshot, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    <script>
+        const SUPABASE_URL = "https://hvbrskchlpemypawpqjn.supabase.co/rest/v1";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2YnJza2NobHBlbXlwYXdwcWpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzYzNzksImV4cCI6MjA5MjUxMjM3OX0.0NCroyTHROeQ3SNKOTNZS1H1hxrGy5wGTLGWm5YdOdo"; 
+        const headersSupa = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
 
         const role = localStorage.getItem('ms_role');
-        const uid = localStorage.getItem('ms_user_id');
+        const uid = localStorage.getItem('ms_user_id'); // NIK Kader
         
         if (role !== 'member' || !uid) {
             window.location.href = "index.html";
@@ -123,12 +124,16 @@
 
         async function loadUserData() {
             try {
-                const uSnap = await getDoc(doc(db, "users", uid));
-                if(uSnap.exists()) {
-                    const d = uSnap.data();
-                    document.getElementById('user-points').innerText = d.points.toLocaleString();
-                    document.getElementById('user-name').innerText = d.name;
-                    document.getElementById('user-id-text').innerText = "ID: " + uid;
+                const res = await fetch(`${SUPABASE_URL}/master_kader?nik=eq.${uid}&select=*`, { headers: headersSupa });
+                const data = await res.json();
+                
+                if(data.length > 0) {
+                    const d = data[0];
+                    document.getElementById('user-points').innerText = (d.konekta_points || 0).toLocaleString();
+                    document.getElementById('user-name').innerText = d.nama || "Tanpa Nama";
+                    
+                    const maskedUID = uid.substring(0, 4) + "********" + uid.substring(12);
+                    document.getElementById('user-id-text').innerText = "ID: " + maskedUID;
                     
                     document.getElementById("qrcode-area").innerHTML = "";
                     new QRCode(document.getElementById("qrcode-area"), { text: uid, width: 200, height: 200, colorDark: "#0f766e" });
@@ -140,38 +145,38 @@
             }
         }
 
-        function loadHistory() {
-            const q = query(collection(db, "history"), where("userId", "==", uid));
-            onSnapshot(q, (snap) => {
+        async function loadHistory() {
+            try {
+                const res = await fetch(`${SUPABASE_URL}/konekta_history?user_id=eq.${uid}&order=date.desc`, { headers: headersSupa });
+                const data = await res.json();
+                
                 const list = document.getElementById('history-list');
-                if(snap.empty) { 
+                if(data.length === 0) { 
                     list.innerHTML = '<p class="text-[10px] text-gray-500 py-6 uppercase font-black text-center">Belum ada riwayat</p>'; 
                     return; 
                 }
-                const docs = snap.docs.map(d => d.data()).sort((a,b) => (b.date?.seconds || 0) - (a.date?.seconds || 0));
-                list.innerHTML = docs.map(h => `<div class="p-4 bg-gray-50 rounded-2xl flex justify-between items-center text-[11px] font-bold uppercase border border-gray-200 mb-2"><div class="text-left"><p class="text-gray-800">${h.activity}</p><p class="text-[10px] text-gray-500 font-bold mt-1">${h.eventDate || 'Hari ini'}</p></div><span class="${h.points < 0 ? 'text-red-600' : 'text-teal-700'} text-sm font-black">+${h.points} P</span></div>`).join('');
-            });
+                list.innerHTML = data.map(h => `<div class="p-4 bg-gray-50 rounded-2xl flex justify-between items-center text-[11px] font-bold uppercase border border-gray-200 mb-2"><div class="text-left"><p class="text-gray-800">${h.activity}</p><p class="text-[10px] text-gray-500 font-bold mt-1">${h.event_date || 'Hari ini'}</p></div><span class="${h.points < 0 ? 'text-red-600' : 'text-teal-700'} text-sm font-black">${h.points > 0 ? '+'+h.points : h.points} P</span></div>`).join('');
+            } catch (e) { console.error(e); }
         }
 
         async function loadLeaderboard() {
             const list = document.getElementById('leaderboard-list');
             try {
-                const q = query(collection(db, "users"), where("role", "==", "member"), orderBy("points", "desc"), limit(5));
-                const snap = await getDocs(q);
+                const res = await fetch(`${SUPABASE_URL}/master_kader?order=konekta_points.desc&limit=5&select=nama,domisili,konekta_points`, { headers: headersSupa });
+                const data = await res.json();
+                
                 list.innerHTML = "";
                 let rank = 1;
-                snap.forEach(d => {
-                    const u = d.data();
+                data.forEach(u => {
                     let medal = rank === 1 ? '🥇' : (rank === 2 ? '🥈' : (rank === 3 ? '🥉' : `#${rank}`));
-                    const maskedName = u.name.split(' ')[0].substring(0, 3) + "***";
-                    const location = u.domicile ? (u.domicile.includes(')') ? u.domicile.split(') ')[1] : u.domicile) : "Surabaya";
+                    const maskedName = u.nama ? u.nama.split(' ')[0].substring(0, 3) + "***" : "Anonim";
+                    const location = u.domisili ? (u.domisili.includes(')') ? u.domisili.split(') ')[1] : u.domisili) : "Surabaya";
                     
-                    list.innerHTML += `<div class="flex justify-between items-center border-b border-yellow-200 pb-2 mb-2 last:border-0"><div class="text-left flex items-center gap-3"><span class="font-black text-base w-6">${medal}</span><div><p class="text-xs font-bold text-gray-800 uppercase leading-tight">${maskedName}</p><p class="text-[10px] font-bold text-gray-500 leading-tight mt-0.5">${location}</p></div></div><span class="text-xs font-black text-teal-700">${u.points} P</span></div>`;
+                    list.innerHTML += `<div class="flex justify-between items-center border-b border-yellow-200 pb-2 mb-2 last:border-0"><div class="text-left flex items-center gap-3"><span class="font-black text-base w-6">${medal}</span><div><p class="text-xs font-bold text-gray-800 uppercase leading-tight">${maskedName}</p><p class="text-[10px] font-bold text-gray-500 leading-tight mt-0.5">${location}</p></div></div><span class="text-xs font-black text-teal-700">${u.konekta_points || 0} P</span></div>`;
                     rank++;
                 });
             } catch (e) { 
-                list.innerHTML = `<p class="text-[10px] font-bold text-red-500">Gagal memuat klasemen. Database butuh Index.</p>`; 
-                console.log(e); 
+                list.innerHTML = `<p class="text-[10px] font-bold text-red-500">Gagal memuat klasemen.</p>`; 
             }
         }
 
@@ -207,28 +212,41 @@
             Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
             
             try {
-                const evSnap = await getDoc(doc(db, "active_events", eid));
+                const resEv = await fetch(`${SUPABASE_URL}/konekta_events?id=eq.${eid}`, { headers: headersSupa });
+                const evData = await resEv.json();
                 
-                if(evSnap.exists() && evSnap.data().status === 'active') {
-                    const mRef = doc(db, "users", uid);
-                    const logId = `${uid}_${eid}`;
+                if(evData.length > 0 && evData[0].status === 'active') {
+                    const eventData = evData[0];
+                    const logId = `${uid}_${eid}`; // NIK_EventID
                     
-                    const logCheck = await getDoc(doc(db, "history", logId));
-                    if(logCheck.exists()) return Swal.fire("Info", "Anda sudah tercatat hadir di event ini.", "warning");
+                    const resHist = await fetch(`${SUPABASE_URL}/konekta_history?id=eq.${logId}`, { headers: headersSupa });
+                    const histData = await resHist.json();
                     
-                    const eventData = evSnap.data();
+                    if(histData.length > 0) return Swal.fire("Info", "Anda sudah tercatat hadir di event ini.", "warning");
+                    
                     const userName = document.getElementById('user-name').innerText;
+                    const currentPoints = parseInt(document.getElementById('user-points').innerText.replace(/\D/g, ''));
                     
-                    await updateDoc(mRef, { points: increment(eventData.points), presence_count: increment(1) });
-                    await setDoc(doc(db, "history", logId), { 
-                        userId: uid, 
-                        userName: userName, 
-                        userNik: "SELF", 
-                        activityId: eid, 
-                        activity: `Hadir: ${eventData.name}`, 
-                        points: eventData.points, 
-                        date: serverTimestamp(), 
-                        eventDate: eventData.date 
+                    // Update Poin Kader
+                    await fetch(`${SUPABASE_URL}/master_kader?nik=eq.${uid}`, {
+                        method: 'PATCH', headers: headersSupa, 
+                        body: JSON.stringify({ 
+                            konekta_points: currentPoints + eventData.points 
+                        })
+                    });
+
+                    // Tambah History Absen
+                    await fetch(`${SUPABASE_URL}/konekta_history`, {
+                        method: 'POST', headers: headersSupa, 
+                        body: JSON.stringify({ 
+                            id: logId,
+                            user_id: uid, 
+                            user_name: userName, 
+                            activity_id: eid, 
+                            activity: `Hadir: ${eventData.name}`, 
+                            points: eventData.points, 
+                            event_date: eventData.date 
+                        })
                     });
                     
                     hist[eid] = true; 
@@ -240,13 +258,11 @@
                 }
             } catch (e) {
                 Swal.fire("Error", "Gagal memproses QR Code.", "error");
-                console.error(e);
             }
         }
 
         window.processRedeem = async (id, cost, name, type) => {
-            const uSnap = await getDoc(doc(db, "users", uid));
-            const currentPoints = uSnap.data().points;
+            const currentPoints = parseInt(document.getElementById('user-points').innerText.replace(/\D/g, ''));
             
             if(currentPoints < cost) {
                 return Swal.fire("Gagal", `Poin kurang! Anda butuh ${cost} poin. Poin Anda: ${currentPoints}`, "error");
@@ -263,16 +279,26 @@
                 if(r.isConfirmed && r.value) {
                     Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
                     try {
-                        await updateDoc(doc(db, "users", uid), { points: increment(-cost) });
-                        await addDoc(collection(db, "redeem_orders"), { 
-                            userId: uid, 
-                            userName: uSnap.data().name, 
-                            userWA: uSnap.data().whatsapp, 
-                            itemName: name, 
-                            targetInfo: r.value, 
-                            date: serverTimestamp(), 
-                            status: 'pending' 
+                        const userName = document.getElementById('user-name').innerText;
+                        
+                        const resU = await fetch(`${SUPABASE_URL}/master_kader?nik=eq.${uid}&select=no_whatsapp`, { headers: headersSupa });
+                        const userWa = (await resU.json())[0]?.no_whatsapp || "";
+
+                        await fetch(`${SUPABASE_URL}/master_kader?nik=eq.${uid}`, {
+                            method: 'PATCH', headers: headersSupa, body: JSON.stringify({ konekta_points: currentPoints - cost })
                         });
+
+                        await fetch(`${SUPABASE_URL}/konekta_redeems`, {
+                            method: 'POST', headers: headersSupa, body: JSON.stringify({
+                                user_id: uid, 
+                                user_name: userName, 
+                                user_wa: userWa, 
+                                item_name: name, 
+                                target_info: r.value, 
+                                status: 'pending'
+                            })
+                        });
+
                         Swal.fire("Berhasil", "Permintaan pencairan dana terkirim. Admin akan menghubungi Anda via WA.", "success").then(() => location.reload());
                     } catch (e) {
                         Swal.fire("Error", "Gagal melakukan penarikan.", "error");
@@ -287,10 +313,10 @@
             document.getElementById('my-orders-modal').classList.remove('hidden');
             
             try {
-                const q = query(collection(db, "redeem_orders"), where("userId", "==", uid), orderBy("date", "desc"));
-                const snap = await getDocs(q);
+                const res = await fetch(`${SUPABASE_URL}/konekta_redeems?user_id=eq.${uid}&order=date.desc`, { headers: headersSupa });
+                const snap = await res.json();
                 
-                if (snap.empty) {
+                if (snap.length === 0) {
                     list.innerHTML = `
                     <div class="flex flex-col items-center justify-center h-40 text-gray-500">
                         <span class="text-5xl mb-3">🤷‍♂️</span>
@@ -298,18 +324,16 @@
                     </div>`;
                 } else {
                     list.innerHTML = "";
-                    snap.forEach(d => {
-                        const o = d.data();
+                    snap.forEach(o => {
                         const statusColor = o.status === 'completed' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-yellow-100 text-yellow-700 border-yellow-200';
                         const statusText = o.status === 'completed' ? 'SELESAI' : 'DIPROSES';
-                        const dateStr = o.date ? new Date(o.date.seconds*1000).toLocaleDateString() : 'Baru saja';
+                        const dateStr = o.date ? new Date(o.date).toLocaleDateString() : 'Baru saja';
                         
-                        list.innerHTML += `<div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex justify-between items-center mb-3 last:mb-0"><div><p class="text-sm font-black text-gray-800">${o.itemName}</p><p class="text-[10px] font-bold text-gray-500 mt-1">${dateStr} • ${o.targetInfo}</p></div><span class="px-4 py-1.5 rounded-full text-[10px] font-black border ${statusColor}">${statusText}</span></div>`;
+                        list.innerHTML += `<div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex justify-between items-center mb-3 last:mb-0"><div><p class="text-sm font-black text-gray-800">${o.item_name}</p><p class="text-[10px] font-bold text-gray-500 mt-1">${dateStr} • ${o.target_info}</p></div><span class="px-4 py-1.5 rounded-full text-[10px] font-black border ${statusColor}">${statusText}</span></div>`;
                     });
                 }
             } catch (e) {
                 list.innerHTML = `<p class="text-center font-bold text-sm text-red-500 mt-4">Gagal memuat riwayat.</p>`;
-                console.error(e);
             }
         };
 
@@ -343,16 +367,15 @@
         loadUserData();
         loadHistory();
         loadLeaderboard();
+        
+        setInterval(loadUserData, 15000); 
 
     </script>
-
+    
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js')
-                    .then(registration => {
-                        console.log('ServiceWorker sukses didaftarkan dengan scope: ', registration.scope);
-                    })
                     .catch(error => {
                         console.log('ServiceWorker gagal didaftarkan: ', error);
                     });
