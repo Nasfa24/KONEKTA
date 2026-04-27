@@ -150,7 +150,7 @@
                 
                 <div class="space-y-3">
                     <input type="text" id="korlap-user" placeholder="Buat Username (Contoh: korlap_gubeng)" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none font-bold text-sm focus:border-[#0f766e] transition-all">
-                    <input type="text" id="korlap-pass" placeholder="Buat Password" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none font-bold text-sm focus:border-[#0f766e] transition-all">
+                    <input type="password" id="korlap-pass" placeholder="Buat Password" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none font-bold text-sm focus:border-[#0f766e] transition-all">
                     <input type="text" id="korlap-name" placeholder="Nama Lengkap Korlap" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none font-bold text-sm focus:border-[#0f766e] transition-all">
                     <input type="text" inputmode="numeric" id="korlap-wa" placeholder="No. WhatsApp Korlap (Awali 62)" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none font-bold text-sm focus:border-[#0f766e] transition-all">
                     
@@ -236,8 +236,12 @@
         let currentSelectedEventId = null;
         let currentAttendeeData = [];
 
+        // UPDATE: Penambahan count=exact agar total member (populasi) muncul di Dashboard
         if(role === 'super_gm') {
-            fetch(`${SUPABASE_URL}/master_kader?select=nik`, { method: 'HEAD', headers: headersSupa })
+            fetch(`${SUPABASE_URL}/master_kader?select=nik`, { 
+                method: 'HEAD', 
+                headers: { ...headersSupa, 'Prefer': 'count=exact' } 
+            })
             .then(res => {
                 let range = res.headers.get('content-range');
                 document.getElementById('total-members').innerText = range ? range.split('/')[1] : 0;
@@ -551,6 +555,7 @@
             document.body.removeChild(a);
         };
 
+        // UPDATE: FORMAT WILAYAH RAPI DI STATISTIK
         window.openRegionStats = async () => {
             const btn = document.getElementById('btn-view-regions');
             const originalText = btn.innerText; 
@@ -562,7 +567,15 @@
                 const regionCounts = {};
                 
                 data.forEach(d => { 
-                    const dom = d.domisili ? (d.domisili.includes(') ') ? d.domisili.split(') ')[1] : d.domisili) : "Tidak Diketahui"; 
+                    let dom = d.domisili || "Tidak Diketahui"; 
+                    
+                    // Mengubah format "(Kecamatan) Kelurahan" menjadi "Kelurahan, Kec. Kecamatan"
+                    if (dom.includes(') ')) {
+                        let parts = dom.split(') ');
+                        let kec = parts[0].replace('(', '');
+                        dom = `${parts[1]}, Kec. ${kec}`;
+                    }
+                    
                     regionCounts[dom] = (regionCounts[dom] || 0) + 1; 
                 });
                 
@@ -754,6 +767,15 @@
         }, 15000);
         loadActiveLocations();
 
+    </script>
+    
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .catch(error => { console.log('ServiceWorker gagal:', error); });
+            });
+        }
     </script>
 </body>
 </html>

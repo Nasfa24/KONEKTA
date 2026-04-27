@@ -170,7 +170,17 @@
                 data.forEach(u => {
                     let medal = rank === 1 ? '🥇' : (rank === 2 ? '🥈' : (rank === 3 ? '🥉' : `#${rank}`));
                     const maskedName = u.nama ? u.nama.split(' ')[0].substring(0, 3) + "***" : "Anonim";
-                    const location = u.domisili ? (u.domisili.includes(')') ? u.domisili.split(') ')[1] : u.domisili) : "Surabaya";
+                    
+                    // FORMAT WILAYAH RAPI: Kelurahan, Kec. Kecamatan
+                    let location = "Tidak Diketahui";
+                    if (u.domisili) {
+                        if (u.domisili.includes(') ')) {
+                            let parts = u.domisili.split(') ');
+                            location = `${parts[1]}, Kec. ${parts[0].replace('(', '')}`;
+                        } else {
+                            location = u.domisili;
+                        }
+                    }
                     
                     list.innerHTML += `<div class="flex justify-between items-center border-b border-yellow-200 pb-2 mb-2 last:border-0"><div class="text-left flex items-center gap-3"><span class="font-black text-base w-6">${medal}</span><div><p class="text-xs font-bold text-gray-800 uppercase leading-tight">${maskedName}</p><p class="text-[10px] font-bold text-gray-500 leading-tight mt-0.5">${location}</p></div></div><span class="text-xs font-black text-teal-700">${u.konekta_points || 0} P</span></div>`;
                     rank++;
@@ -227,15 +237,11 @@
                     const userName = document.getElementById('user-name').innerText;
                     const currentPoints = parseInt(document.getElementById('user-points').innerText.replace(/\D/g, ''));
                     
-                    // Update Poin Kader
                     await fetch(`${SUPABASE_URL}/master_kader?nik=eq.${uid}`, {
                         method: 'PATCH', headers: headersSupa, 
-                        body: JSON.stringify({ 
-                            konekta_points: currentPoints + eventData.points 
-                        })
+                        body: JSON.stringify({ konekta_points: currentPoints + eventData.points })
                     });
 
-                    // Tambah History Absen
                     await fetch(`${SUPABASE_URL}/konekta_history`, {
                         method: 'POST', headers: headersSupa, 
                         body: JSON.stringify({ 
