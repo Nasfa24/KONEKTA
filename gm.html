@@ -153,7 +153,7 @@
                     <input type="text" id="korlap-name" placeholder="Nama Lengkap Korlap" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none font-bold text-sm focus:border-[#0f766e] transition-all">
                     <input type="text" inputmode="numeric" id="korlap-wa" placeholder="No. WhatsApp Korlap (Awali 62)" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none font-bold text-sm focus:border-[#0f766e] transition-all">
                     
-                    <button id="btn-submit-korlap" onclick="createKorlap()" class="w-full bg-gray-900 text-white py-4 rounded-2xl font-black shadow-lg uppercase text-xs active:scale-95 text-center mt-4">Simpan Akun Korlap</button>
+                    <button id="btn-submit-korlap" onclick="createKorlap()" class="w-full bg-gray-900 text-white py-4 rounded-2xl font-black shadow-lg uppercase text-xs active:scale-95 text-center mt-4 transition-colors hover:bg-gray-800">Simpan Akun Korlap</button>
                 </div>
             </div>
         </div>
@@ -235,7 +235,6 @@
         let currentSelectedEventId = null;
         let currentAttendeeData = [];
 
-        // UPDATE: HITUNG TOTAL MEMBER (Metode GET agar tidak disensor)
         if(role === 'super_gm') {
             fetch(`${SUPABASE_URL}/master_kader?select=nik&limit=1`, { 
                 method: 'GET', 
@@ -553,7 +552,6 @@
             document.body.removeChild(a);
         };
 
-        // UPDATE: FORMAT WILAYAH RAPI DI STATISTIK WILAYAH
         window.openRegionStats = async () => {
             const btn = document.getElementById('btn-view-regions');
             const originalText = btn.innerText; 
@@ -567,7 +565,6 @@
                 data.forEach(d => { 
                     let dom = d.domisili || "Belum Set Domisili"; 
                     
-                    // Mengubah format "(Kecamatan) Kelurahan" menjadi "Kelurahan, Kec. Kecamatan"
                     if (dom.includes(') ')) {
                         let parts = dom.split(') ');
                         let kec = parts[0].replace('(', '');
@@ -716,6 +713,7 @@
             });
         };
 
+        // UPDATE: TAMPILAN NOTIFIKASI KORLAP BARU YANG LEBIH ELEGAN DAN INTERAKTIF
         window.createKorlap = async () => {
             const u = document.getElementById('korlap-user').value.toLowerCase().replace(/\s+/g, '');
             const p = document.getElementById('korlap-pass').value;
@@ -736,7 +734,27 @@
                     })
                 });
                 
-                Swal.fire("Sukses", `Akun Korlap ${n} berhasil dibuat!\nUsername: ${u}\nPassword: ${p}`, "success");
+                // NOTIFIKASI KARTU ID DIGITAL
+                Swal.fire({
+                    title: '🎉 KORLAP AKTIF!',
+                    html: `
+                        <p class="text-sm text-gray-600 mb-4">Akses Panglima Lapangan berhasil dibuat.</p>
+                        <div class="bg-gray-50 p-4 rounded-2xl border border-gray-200 text-left shadow-inner">
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">NAMA KORLAP</p>
+                            <p class="text-sm font-black text-teal-800 uppercase mb-3">${n}</p>
+                            
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">USERNAME LOGIN</p>
+                            <p class="text-lg font-mono font-black text-gray-900 bg-white px-3 py-2 rounded-xl border border-gray-200 mb-3 select-all">${u}</p>
+                            
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">PASSWORD LOGIN</p>
+                            <p class="text-lg font-mono font-black text-red-600 bg-red-50 px-3 py-2 rounded-xl border border-red-100 select-all">${p}</p>
+                        </div>
+                        <p class="text-[10px] text-gray-400 italic mt-4 font-bold">*Silakan Screenshot halaman ini dan berikan ke Korlap bersangkutan.</p>
+                    `,
+                    icon: 'success',
+                    confirmButtonColor: '#0f766e',
+                    confirmButtonText: 'Sip, Mantap!'
+                });
                 
                 document.getElementById('korlap-user').value = '';
                 document.getElementById('korlap-pass').value = '';
