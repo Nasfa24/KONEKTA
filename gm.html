@@ -6,7 +6,6 @@
     <title>Console GM - KONEKTA</title>
 
     <link rel="icon" href="logo.png" type="image/png">
-    
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f766e">
     <link rel="apple-touch-icon" href="logo.png">
@@ -236,15 +235,16 @@
         let currentSelectedEventId = null;
         let currentAttendeeData = [];
 
-        // UPDATE: Penambahan count=exact agar total member (populasi) muncul di Dashboard
+        // UPDATE: HITUNG TOTAL MEMBER (Limit 1 dengan Count=Exact agar Angka Muncull)
         if(role === 'super_gm') {
-            fetch(`${SUPABASE_URL}/master_kader?select=nik`, { 
-                method: 'HEAD', 
+            fetch(`${SUPABASE_URL}/master_kader?select=nik&limit=1`, { 
+                method: 'GET', 
                 headers: { ...headersSupa, 'Prefer': 'count=exact' } 
             })
             .then(res => {
                 let range = res.headers.get('content-range');
-                document.getElementById('total-members').innerText = range ? range.split('/')[1] : 0;
+                let count = range ? range.split('/')[1] : 0;
+                document.getElementById('total-members').innerText = count;
             }).catch(e => console.log(e));
         }
 
@@ -567,7 +567,7 @@
                 const regionCounts = {};
                 
                 data.forEach(d => { 
-                    let dom = d.domisili || "Tidak Diketahui"; 
+                    let dom = d.domisili || "Belum Set Domisili"; 
                     
                     // Mengubah format "(Kecamatan) Kelurahan" menjadi "Kelurahan, Kec. Kecamatan"
                     if (dom.includes(') ')) {
@@ -724,7 +724,7 @@
             });
         };
 
-        // --- TAMBAHAN: FUNGSI BUAT KORLAP BARU (KHUSUS SUPER GM) ---
+        // UPDATE: Penyesuaian ke tabel konekta_admins menggunakan 'name' sebagai Primary Key
         window.createKorlap = async () => {
             const u = document.getElementById('korlap-user').value.toLowerCase().replace(/\s+/g, '');
             const p = document.getElementById('korlap-pass').value;
@@ -738,8 +738,7 @@
             try {
                 await fetch(`${SUPABASE_URL}/konekta_admins`, {
                     method: 'POST', headers: headersSupa, body: JSON.stringify({
-                        id: u,
-                        name: n,
+                        name: u, 
                         wa: wa.startsWith('0') ? '62' + wa.slice(1) : wa,
                         password: p,
                         role: 'gm'
@@ -759,7 +758,6 @@
             }
         };
 
-        // Auto Refresh Locations
         setInterval(() => {
             if(document.getElementById('gm-section-event').classList.contains('hidden') === false && document.getElementById('gm-event-selector').classList.contains('hidden') === false) {
                 loadActiveLocations();
@@ -767,15 +765,6 @@
         }, 15000);
         loadActiveLocations();
 
-    </script>
-    
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .catch(error => { console.log('ServiceWorker gagal:', error); });
-            });
-        }
     </script>
 </body>
 </html>

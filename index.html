@@ -193,18 +193,15 @@
             btn.innerText = "Mendaftarkan...";
             
             try {
-                // Cek eksistensi NIK di Supabase master_kader
                 const res = await fetch(`${SUPABASE_URL}/master_kader?nik=eq.${nik}&select=nik`, { headers: headersSupa });
                 const existing = await res.json();
 
                 if(existing.length > 0) {
-                    // Update jika kader LPP/Lebah Kreatif sudah ada
                     await fetch(`${SUPABASE_URL}/master_kader?nik=eq.${nik}`, {
                         method: 'PATCH', headers: headersSupa, 
                         body: JSON.stringify({ domisili: dom, konekta_points: 10, konekta_presence_count: 0 })
                     });
                 } else {
-                    // Insert baru
                     await fetch(`${SUPABASE_URL}/master_kader`, {
                         method: 'POST', headers: headersSupa, 
                         body: JSON.stringify({ 
@@ -249,6 +246,7 @@
             }
         };
 
+        // UPDATE: LOGIN 100% TERHUBUNG DENGAN TABEL ADMIN SUPABASE
         window.loginAdmin = async () => {
             const u = document.getElementById('gm-user').value;
             const p = document.getElementById('gm-pass').value;
@@ -259,29 +257,42 @@
             btn.innerText = "Memeriksa...";
             
             try {
-                if(u === "supergm" && btoa(p) === "amFudWFyaTIwMjY=") { 
-                    localStorage.setItem('ms_role', 'super_gm'); 
-                    localStorage.setItem('ms_admin_name', 'Pusat Komando');
-                    localStorage.setItem('ms_admin_wa', '6281339760265'); 
-                    window.location.href = "gm.html";
-                    return;
+                // 1. Cek di tabel master_admin (Untuk Super GM LPP)
+                let resAdmin = await fetch(`${SUPABASE_URL}/master_admin?username=eq.${u}&select=*`, { headers: headersSupa });
+                let dataAdmin = await resAdmin.json();
+
+                if (dataAdmin.length > 0) {
+                    if (dataAdmin[0].password === p) {
+                        localStorage.setItem('ms_role', 'super_gm');
+                        localStorage.setItem('ms_admin_id', u);
+                        localStorage.setItem('ms_admin_name', dataAdmin[0].nama_admin);
+                        localStorage.setItem('ms_admin_wa', '6281339760265'); // Default WA Pusat
+                        window.location.href = "gm.html";
+                        return;
+                    } else {
+                        Swal.fire("Ditolak", "Password salah!", "error");
+                        btn.innerText = "Login Console";
+                        return;
+                    }
                 }
+
+                // 2. Cek di tabel konekta_admins (Untuk GM dan Korlap Wilayah)
+                let resKorlap = await fetch(`${SUPABASE_URL}/konekta_admins?name=eq.${u}&select=*`, { headers: headersSupa });
+                let dataKorlap = await resKorlap.json();
                 
-                const res = await fetch(`${SUPABASE_URL}/konekta_admins?id=eq.${u}&select=*`, { headers: headersSupa });
-                const data = await res.json();
-                
-                if (data.length > 0) {
-                    if (data[0].password === p) {
-                        localStorage.setItem('ms_role', 'gm'); 
+                if (dataKorlap.length > 0) {
+                    if (dataKorlap[0].password === p) {
+                        let roleType = dataKorlap[0].role === 'supergm' ? 'super_gm' : 'gm';
+                        localStorage.setItem('ms_role', roleType); 
                         localStorage.setItem('ms_admin_id', u); 
-                        localStorage.setItem('ms_admin_name', data[0].name);
-                        localStorage.setItem('ms_admin_wa', data[0].wa);
+                        localStorage.setItem('ms_admin_name', dataKorlap[0].name);
+                        localStorage.setItem('ms_admin_wa', dataKorlap[0].wa);
                         window.location.href = "gm.html";
                     } else {
                         Swal.fire("Ditolak", "Password salah!", "error");
                     }
                 } else {
-                    Swal.fire("Ditolak", "Username Korlap tidak ditemukan!", "error");
+                    Swal.fire("Ditolak", "Username tidak ditemukan di database!", "error");
                 }
             } catch (e) {
                 Swal.fire("Error", "Gagal menghubungi server.", "error");

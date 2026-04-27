@@ -108,7 +108,7 @@
         const headersSupa = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
 
         const role = localStorage.getItem('ms_role');
-        const uid = localStorage.getItem('ms_user_id'); // NIK Kader
+        const uid = localStorage.getItem('ms_user_id'); 
         
         if (role !== 'member' || !uid) {
             window.location.href = "index.html";
@@ -171,8 +171,8 @@
                     let medal = rank === 1 ? '🥇' : (rank === 2 ? '🥈' : (rank === 3 ? '🥉' : `#${rank}`));
                     const maskedName = u.nama ? u.nama.split(' ')[0].substring(0, 3) + "***" : "Anonim";
                     
-                    // FORMAT WILAYAH RAPI: Kelurahan, Kec. Kecamatan
-                    let location = "Tidak Diketahui";
+                    // UPDATE: FORMAT WILAYAH RAPI (Kelurahan, Kec. Kecamatan)
+                    let location = "Belum Set Domisili";
                     if (u.domisili) {
                         if (u.domisili.includes(') ')) {
                             let parts = u.domisili.split(') ');
@@ -227,7 +227,7 @@
                 
                 if(evData.length > 0 && evData[0].status === 'active') {
                     const eventData = evData[0];
-                    const logId = `${uid}_${eid}`; // NIK_EventID
+                    const logId = `${uid}_${eid}`; 
                     
                     const resHist = await fetch(`${SUPABASE_URL}/konekta_history?id=eq.${logId}`, { headers: headersSupa });
                     const histData = await resHist.json();
@@ -376,17 +376,6 @@
         
         setInterval(loadUserData, 15000); 
 
-    </script>
-    
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .catch(error => {
-                        console.log('ServiceWorker gagal didaftarkan: ', error);
-                    });
-            });
-        }
     </script>
 </body>
 </html>
