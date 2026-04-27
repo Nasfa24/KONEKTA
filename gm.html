@@ -235,7 +235,7 @@
         let currentSelectedEventId = null;
         let currentAttendeeData = [];
 
-        // UPDATE: HITUNG TOTAL MEMBER (Limit 1 dengan Count=Exact agar Angka Muncull)
+        // UPDATE: HITUNG TOTAL MEMBER (Metode GET agar tidak disensor)
         if(role === 'super_gm') {
             fetch(`${SUPABASE_URL}/master_kader?select=nik&limit=1`, { 
                 method: 'GET', 
@@ -494,8 +494,6 @@
             } catch (e) { console.error(e); }
         };
 
-        // --- ATTENDEE & REGION STATS ---
-
         window.openAttendeeList = async () => {
             const btn = document.getElementById('btn-view-attendees'); 
             const originalHTML = btn.innerHTML;
@@ -555,7 +553,7 @@
             document.body.removeChild(a);
         };
 
-        // UPDATE: FORMAT WILAYAH RAPI DI STATISTIK
+        // UPDATE: FORMAT WILAYAH RAPI DI STATISTIK WILAYAH
         window.openRegionStats = async () => {
             const btn = document.getElementById('btn-view-regions');
             const originalText = btn.innerText; 
@@ -604,8 +602,6 @@
 
         window.closeRegionStats = () => { document.getElementById('region-stats-modal').classList.add('hidden'); };
 
-        // --- SCANNER GM LOGIC (MANUAL ABSEN) ---
-
         window.openGMScannerMode = () => {
             document.getElementById('scanner-modal').classList.remove('hidden');
             html5QrCode = new Html5Qrcode("reader");
@@ -645,10 +641,8 @@
                 
                 const currentPts = uData[0].konekta_points || 0;
 
-                // Update Points
                 await fetch(`${SUPABASE_URL}/master_kader?nik=eq.${mid}`, { method: 'PATCH', headers: headersSupa, body: JSON.stringify({ konekta_points: currentPts + evData[0].points }) });
                 
-                // Add History
                 await fetch(`${SUPABASE_URL}/konekta_history`, { method: 'POST', headers: headersSupa, body: JSON.stringify({ 
                     id: logId,
                     user_id: mid, 
@@ -664,8 +658,6 @@
                 Swal.fire("Error", "Gagal memproses absen manual.", "error");
             }
         }
-
-        // --- REDEEM ORDERS LOGIC ---
 
         async function loadRedeemOrders() {
             try {
@@ -724,7 +716,6 @@
             });
         };
 
-        // UPDATE: Penyesuaian ke tabel konekta_admins menggunakan 'name' sebagai Primary Key
         window.createKorlap = async () => {
             const u = document.getElementById('korlap-user').value.toLowerCase().replace(/\s+/g, '');
             const p = document.getElementById('korlap-pass').value;

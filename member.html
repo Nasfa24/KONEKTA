@@ -6,7 +6,6 @@
     <title>Dashboard Konektor - KONEKTA</title>
 
     <link rel="icon" href="logo.png" type="image/png">
-    
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f766e">
     <link rel="apple-touch-icon" href="logo.png">
@@ -108,7 +107,7 @@
         const headersSupa = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
 
         const role = localStorage.getItem('ms_role');
-        const uid = localStorage.getItem('ms_user_id'); 
+        const uid = localStorage.getItem('ms_user_id'); // NIK Kader
         
         if (role !== 'member' || !uid) {
             window.location.href = "index.html";
@@ -171,8 +170,8 @@
                     let medal = rank === 1 ? '🥇' : (rank === 2 ? '🥈' : (rank === 3 ? '🥉' : `#${rank}`));
                     const maskedName = u.nama ? u.nama.split(' ')[0].substring(0, 3) + "***" : "Anonim";
                     
-                    // UPDATE: FORMAT WILAYAH RAPI (Kelurahan, Kec. Kecamatan)
-                    let location = "Belum Set Domisili";
+                    // Format Lokasi Menjadi Lebih Rapi (Kelurahan, Kec. Kecamatan)
+                    let location = "Tidak Diketahui";
                     if (u.domisili) {
                         if (u.domisili.includes(') ')) {
                             let parts = u.domisili.split(') ');
@@ -227,7 +226,7 @@
                 
                 if(evData.length > 0 && evData[0].status === 'active') {
                     const eventData = evData[0];
-                    const logId = `${uid}_${eid}`; 
+                    const logId = `${uid}_${eid}`;
                     
                     const resHist = await fetch(`${SUPABASE_URL}/konekta_history?id=eq.${logId}`, { headers: headersSupa });
                     const histData = await resHist.json();

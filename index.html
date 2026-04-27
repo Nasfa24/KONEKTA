@@ -86,44 +86,27 @@
     </div>
 
     <script>
-        // KREDENSIAL SUPABASE
         const SUPABASE_URL = "https://hvbrskchlpemypawpqjn.supabase.co/rest/v1";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2YnJza2NobHBlbXlwYXdwcWpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzYzNzksImV4cCI6MjA5MjUxMjM3OX0.0NCroyTHROeQ3SNKOTNZS1H1hxrGy5wGTLGWm5YdOdo"; 
         const headersSupa = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
 
         const SURABAYA_LOCATIONS = [
-            "(Asemrowo) Asemrowo", "(Asemrowo) Genting Kalianak", "(Asemrowo) Tambak Sarioso",
-            "(Benowo) Kandangan", "(Benowo) Romokalisari", "(Benowo) Sememi", "(Benowo) Tambak Oso Wilangon",
-            "(Bubutan) Alon-Alon Contong", "(Bubutan) Bubutan", "(Bubutan) Gundih", "(Bubutan) Jepara", "(Bubutan) Tembok Dukuh",
-            "(Bulak) Bulak", "(Bulak) Kedung Cowek", "(Bulak) Kenjeran", "(Bulak) Sukolilo Baru",
-            "(Dukuh Pakis) Dukuh Kupang", "(Dukuh Pakis) Dukuh Pakis", "(Dukuh Pakis) Gunungsari", "(Dukuh Pakis) Pradahkali Kendal",
-            "(Gayungan) Dukuh Menanggal", "(Gayungan) Gayungan", "(Gayungan) Ketintang", "(Gayungan) Menanggal",
-            "(Genteng) Embong Kaliasin", "(Genteng) Genteng", "(Genteng) Kapasari", "(Genteng) Ketabang", "(Genteng) Peneleh",
-            "(Gubeng) Airlangga", "(Gubeng) Baratajaya", "(Gubeng) Gubeng", "(Gubeng) Kertajaya", "(Gubeng) Mojo", "(Gubeng) Pucang Sewu",
-            "(Gunung Anyar) Gunung Anyar", "(Gunung Anyar) Gunung Anyar Tambak", "(Gunung Anyar) Rungkut Menanggal", "(Gunung Anyar) Rungkut Tengah",
-            "(Jambangan) Jambangan", "(Jambangan) Karah", "(Jambangan) Kebonsari", "(Jambangan) Pagesangan",
-            "(Karang Pilang) Karang Pilang", "(Karang Pilang) Kebraon", "(Karang Pilang) Kedurus", "(Karang Pilang) Warugunung",
-            "(Kenjeran) Bulak Banteng", "(Kenjeran) Sidotopo Wetan", "(Kenjeran) Tambak Wedi", "(Kenjeran) Tanah Kali Kedinding",
-            "(Krembangan) Dupak", "(Krembangan) Kemayoran", "(Krembangan) Krembangan Selatan", "(Krembangan) Morokrembangan", "(Krembangan) Perak Barat",
-            "(Lakarsantri) Bangkingan", "(Lakarsantri) Jeruk", "(Lakarsantri) Lakarsantri", "(Lakarsantri) Lidah Kulon", "(Lakarsantri) Lidah Wetan", "(Lakarsantri) Sumur Welut",
-            "(Mulyorejo) Dukuh Sutorejo", "(Mulyorejo) Kalijudan", "(Mulyorejo) Kalisari", "(Mulyorejo) Kejawen Putih Tambak", "(Mulyorejo) Manyar Sabrangan", "(Mulyorejo) Mulyorejo",
-            "(Pabean Cantian) Bongkaran", "(Pabean Cantian) Krembangan Utara", "(Pabean Cantian) Nyamplungan", "(Pabean Cantian) Perak Timur", "(Pabean Cantian) Perak Utara",
-            "(Pakal) Babat Jerawat", "(Pakal) Benowo", "(Pakal) Pakal", "(Pakal) Sumberrejo",
-            "(Rungkut) Kali Rungkut", "(Rungkut) Kedung Baruk", "(Rungkut) Medokan Ayu", "(Rungkut) Penjaringan Sari", "(Rungkut) Rungkut Kidul", "(Rungkut) Wonorejo Rungkut",
-            "(Sambikerep) Bringin", "(Sambikerep) Lontar", "(Sambikerep) Made", "(Sambikerep) Sambikerep",
-            "(Sawahan) Banyu Urip", "(Sawahan) Kupang Krajan", "(Sawahan) Pakis", "(Sawahan) Petemon", "(Sawahan) Putat Jaya", "(Sawahan) Sawahan",
-            "(Semampir) Ampel", "(Semampir) Pegirian", "(Semampir) Sidotopo", "(Semampir) Ujung", "(Semampir) Wonokusumo",
-            "(Simokerto) Kapasan", "(Simokerto) Sidodadi", "(Simokerto) Simokerto", "(Simokerto) Simolawang", "(Simokerto) Tambakrejo",
-            "(Suko Manunggal) Putat Gede", "(Suko Manunggal) Simomulyo", "(Suko Manunggal) Simomulyo Baru", "(Suko Manunggal) Sono Kwijenan", "(Suko Manunggal) Suko Manunggal", "(Suko Manunggal) Tanjungsari",
-            "(Sukolilo) Gebang Putih", "(Sukolilo) Keputih", "(Sukolilo) Klampis Ngasem", "(Sukolilo) Medokan Semampir", "(Sukolilo) Menur Pumpungan", "(Sukolilo) Ngiden Jangkungan", "(Sukolilo) Semolowaru",
-            "(Tambaksari) Dukuh Setro", "(Tambaksari) Gading", "(Tambaksari) Kapasmadya Baru", "(Tambaksari) Pacar Keling", "(Tambaksari) Pacar Kembang", "(Tambaksari) Ploso", "(Tambaksari) Rangkah", "(Tambaksari) Tambaksari",
-            "(Tandes) Balongsari", "(Tandes) Banjar Sugihan", "(Tandes) Karangpoh", "(Tandes) Manukan Kulon", "(Tandes) Manukan Wetan", "(Tandes) Tandes",
-            "(Tegalsari) Dr. Sutomo", "(Tegalsari) Kedungdoro", "(Tegalsari) Keputran", "(Tegalsari) Tegalsari", "(Tegalsari) Wonorejo Tegalsari",
-            "(Tenggilis Mejoyo) Kendangsari", "(Tenggilis Mejoyo) Kutisari", "(Tenggilis Mejoyo) Panjang Jiwo", "(Tenggilis Mejoyo) Tenggilis Mejoyo",
-            "(Wiyung) Babatan", "(Wiyung) Balas Klumprik", "(Wiyung) Jajar Tunggal", "(Wiyung) Wiyung",
-            "(Wonocolo) Bendul Merisi", "(Wonocolo) Jemur Wonosari", "(Wonocolo) Margorejo", "(Wonocolo) Sidosermo", "(Wonocolo) Siwalankerto",
-            "(Wonokromo) Darmo", "(Wonokromo) Jagir", "(Wonokromo) Ngagel", "(Wonokromo) Ngagelrejo", "(Wonokromo) Sawunggaling", "(Wonokromo) Wonokromo",
-            "LUAR SURABAYA"
+            "(Asemrowo) Asemrowo", "(Asemrowo) Genting Kalianak", "(Asemrowo) Tambak Sarioso", "(Benowo) Kandangan", "(Benowo) Romokalisari", "(Benowo) Sememi", "(Benowo) Tambak Oso Wilangon",
+            "(Bubutan) Alon-Alon Contong", "(Bubutan) Bubutan", "(Bubutan) Gundih", "(Bubutan) Jepara", "(Bubutan) Tembok Dukuh", "(Bulak) Bulak", "(Bulak) Kedung Cowek", "(Bulak) Kenjeran", "(Bulak) Sukolilo Baru",
+            "(Dukuh Pakis) Dukuh Kupang", "(Dukuh Pakis) Dukuh Pakis", "(Dukuh Pakis) Gunungsari", "(Dukuh Pakis) Pradahkali Kendal", "(Gayungan) Dukuh Menanggal", "(Gayungan) Gayungan", "(Gayungan) Ketintang", "(Gayungan) Menanggal",
+            "(Genteng) Embong Kaliasin", "(Genteng) Genteng", "(Genteng) Kapasari", "(Genteng) Ketabang", "(Genteng) Peneleh", "(Gubeng) Airlangga", "(Gubeng) Baratajaya", "(Gubeng) Gubeng", "(Gubeng) Kertajaya", "(Gubeng) Mojo", "(Gubeng) Pucang Sewu",
+            "(Gunung Anyar) Gunung Anyar", "(Gunung Anyar) Gunung Anyar Tambak", "(Gunung Anyar) Rungkut Menanggal", "(Gunung Anyar) Rungkut Tengah", "(Jambangan) Jambangan", "(Jambangan) Karah", "(Jambangan) Kebonsari", "(Jambangan) Pagesangan",
+            "(Karang Pilang) Karang Pilang", "(Karang Pilang) Kebraon", "(Karang Pilang) Kedurus", "(Karang Pilang) Warugunung", "(Kenjeran) Bulak Banteng", "(Kenjeran) Sidotopo Wetan", "(Kenjeran) Tambak Wedi", "(Kenjeran) Tanah Kali Kedinding",
+            "(Krembangan) Dupak", "(Krembangan) Kemayoran", "(Krembangan) Krembangan Selatan", "(Krembangan) Morokrembangan", "(Krembangan) Perak Barat", "(Lakarsantri) Bangkingan", "(Lakarsantri) Jeruk", "(Lakarsantri) Lakarsantri", "(Lakarsantri) Lidah Kulon", "(Lakarsantri) Lidah Wetan", "(Lakarsantri) Sumur Welut",
+            "(Mulyorejo) Dukuh Sutorejo", "(Mulyorejo) Kalijudan", "(Mulyorejo) Kalisari", "(Mulyorejo) Kejawen Putih Tambak", "(Mulyorejo) Manyar Sabrangan", "(Mulyorejo) Mulyorejo", "(Pabean Cantian) Bongkaran", "(Pabean Cantian) Krembangan Utara", "(Pabean Cantian) Nyamplungan", "(Pabean Cantian) Perak Timur", "(Pabean Cantian) Perak Utara",
+            "(Pakal) Babat Jerawat", "(Pakal) Benowo", "(Pakal) Pakal", "(Pakal) Sumberrejo", "(Rungkut) Kali Rungkut", "(Rungkut) Kedung Baruk", "(Rungkut) Medokan Ayu", "(Rungkut) Penjaringan Sari", "(Rungkut) Rungkut Kidul", "(Rungkut) Wonorejo Rungkut",
+            "(Sambikerep) Bringin", "(Sambikerep) Lontar", "(Sambikerep) Made", "(Sambikerep) Sambikerep", "(Sawahan) Banyu Urip", "(Sawahan) Kupang Krajan", "(Sawahan) Pakis", "(Sawahan) Petemon", "(Sawahan) Putat Jaya", "(Sawahan) Sawahan",
+            "(Semampir) Ampel", "(Semampir) Pegirian", "(Semampir) Sidotopo", "(Semampir) Ujung", "(Semampir) Wonokusumo", "(Simokerto) Kapasan", "(Simokerto) Sidodadi", "(Simokerto) Simokerto", "(Simokerto) Simolawang", "(Simokerto) Tambakrejo",
+            "(Suko Manunggal) Putat Gede", "(Suko Manunggal) Simomulyo", "(Suko Manunggal) Simomulyo Baru", "(Suko Manunggal) Sono Kwijenan", "(Suko Manunggal) Suko Manunggal", "(Suko Manunggal) Tanjungsari", "(Sukolilo) Gebang Putih", "(Sukolilo) Keputih", "(Sukolilo) Klampis Ngasem", "(Sukolilo) Medokan Semampir", "(Sukolilo) Menur Pumpungan", "(Sukolilo) Ngiden Jangkungan", "(Sukolilo) Semolowaru",
+            "(Tambaksari) Dukuh Setro", "(Tambaksari) Gading", "(Tambaksari) Kapasmadya Baru", "(Tambaksari) Pacar Keling", "(Tambaksari) Pacar Kembang", "(Tambaksari) Ploso", "(Tambaksari) Rangkah", "(Tambaksari) Tambaksari", "(Tandes) Balongsari", "(Tandes) Banjar Sugihan", "(Tandes) Karangpoh", "(Tandes) Manukan Kulon", "(Tandes) Manukan Wetan", "(Tandes) Tandes",
+            "(Tegalsari) Dr. Sutomo", "(Tegalsari) Kedungdoro", "(Tegalsari) Keputran", "(Tegalsari) Tegalsari", "(Tegalsari) Wonorejo Tegalsari", "(Tenggilis Mejoyo) Kendangsari", "(Tenggilis Mejoyo) Kutisari", "(Tenggilis Mejoyo) Panjang Jiwo", "(Tenggilis Mejoyo) Tenggilis Mejoyo",
+            "(Wiyung) Babatan", "(Wiyung) Balas Klumprik", "(Wiyung) Jajar Tunggal", "(Wiyung) Wiyung", "(Wonocolo) Bendul Merisi", "(Wonocolo) Jemur Wonosari", "(Wonocolo) Margorejo", "(Wonocolo) Sidosermo", "(Wonocolo) Siwalankerto",
+            "(Wonokromo) Darmo", "(Wonokromo) Jagir", "(Wonokromo) Ngagel", "(Wonokromo) Ngagelrejo", "(Wonokromo) Sawunggaling", "(Wonokromo) Wonokromo", "LUAR SURABAYA"
         ];
 
         function setupAutocomplete() {
@@ -136,7 +119,6 @@
                 if (query.length < 2) { suggestionsBox.style.display = 'none'; return; }
 
                 const matches = SURABAYA_LOCATIONS.filter(loc => loc.toLowerCase().includes(query));
-                
                 if (matches.length > 0) {
                     suggestionsBox.style.display = 'block';
                     matches.forEach(match => {
@@ -225,7 +207,6 @@
             const btn = document.querySelector('#member-login-fields button');
             
             if(nik.length !== 16) return Swal.fire("Gagal", "NIK harus 16 digit!", "warning");
-            
             btn.innerText = "Mencari Data...";
             
             try {
@@ -237,7 +218,7 @@
                     localStorage.setItem('ms_role', 'member'); 
                     window.location.href = "member.html";
                 } else { 
-                    Swal.fire("Gagal", "NIK tidak ditemukan, silakan mendaftar.", "error"); 
+                    Swal.fire("Gagal", "NIK tidak ditemukan, silakan mendaftar terlebih dahulu.", "error"); 
                 }
             } catch(e) {
                 Swal.fire("Error", "Gagal menghubungi server.", "error");
@@ -246,14 +227,12 @@
             }
         };
 
-        // UPDATE: LOGIN 100% TERHUBUNG DENGAN TABEL ADMIN SUPABASE
         window.loginAdmin = async () => {
             const u = document.getElementById('gm-user').value;
             const p = document.getElementById('gm-pass').value;
             const btn = document.querySelector('#form-gm button');
             
             if (!u || !p) return Swal.fire("Gagal", "Username dan Password wajib diisi!", "warning");
-            
             btn.innerText = "Memeriksa...";
             
             try {
@@ -266,7 +245,7 @@
                         localStorage.setItem('ms_role', 'super_gm');
                         localStorage.setItem('ms_admin_id', u);
                         localStorage.setItem('ms_admin_name', dataAdmin[0].nama_admin);
-                        localStorage.setItem('ms_admin_wa', '6281339760265'); // Default WA Pusat
+                        localStorage.setItem('ms_admin_wa', '6281339760265'); // Default WA LPP
                         window.location.href = "gm.html";
                         return;
                     } else {
@@ -314,17 +293,6 @@
 
         checkSession();
         
-    </script>
-
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .catch(error => {
-                        console.log('ServiceWorker gagal didaftarkan: ', error);
-                    });
-            });
-        }
     </script>
 </body>
 </html>
