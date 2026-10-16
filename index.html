@@ -237,22 +237,20 @@
             
             try {
                 // 1. Cek di tabel master_admin (Untuk Super GM LPP)
-                let resAdmin = await fetch(`${SUPABASE_URL}/master_admin?username=eq.${u}&select=*`, { headers: headersSupa });
+                let resAdmin = await fetch(`${SUPABASE_URL}/rpc/verify_admin_v2`, {
+                    method: 'POST',
+                    headers: headersSupa,
+                    body: JSON.stringify({ p_username: u, p_password: p })
+                });
                 let dataAdmin = await resAdmin.json();
 
                 if (dataAdmin.length > 0) {
-                    if (dataAdmin[0].password === p) {
-                        localStorage.setItem('ms_role', 'super_gm');
-                        localStorage.setItem('ms_admin_id', u);
-                        localStorage.setItem('ms_admin_name', dataAdmin[0].nama_admin);
-                        localStorage.setItem('ms_admin_wa', '6281339760265'); // Default WA LPP
-                        window.location.href = "gm.html";
-                        return;
-                    } else {
-                        Swal.fire("Ditolak", "Password salah!", "error");
-                        btn.innerText = "Login Console";
-                        return;
-                    }
+                    localStorage.setItem('ms_role', 'super_gm');
+                    localStorage.setItem('ms_admin_id', u);
+                    localStorage.setItem('ms_admin_name', dataAdmin[0].nama_admin);
+                    localStorage.setItem('ms_admin_wa', '6281339760265'); // Default WA LPP
+                    window.location.href = "gm.html";
+                    return;
                 }
 
                 // 2. Cek di tabel konekta_admins (Untuk GM dan Korlap Wilayah)
