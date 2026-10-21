@@ -254,22 +254,33 @@
                 }
 
                 // 2. Cek di tabel konekta_admins (Untuk GM dan Korlap Wilayah)
-                let resKorlap = await fetch(`${SUPABASE_URL}/konekta_admins?name=eq.${u}&select=*`, { headers: headersSupa });
+                const key = u.trim().toLowerCase();
+                const digits = key.replace(/[^0-9]/g, '');
+                const wa0 = digits.startsWith('62') ? '0' + digits.slice(2) : digits;
+                const wa62 = wa0.startsWith('0') ? '62' + wa0.slice(1) : wa0;
+                const filter = [
+                    `name.ilike.${encodeURIComponent(key)}`,
+                    wa0 ? `wa.eq.${encodeURIComponent(wa0)}` : null,
+                    wa62 ? `wa.eq.${encodeURIComponent(wa62)}` : null,
+                    key === 'admin' ? 'role.eq.supergm' : null
+                ].filter(Boolean).join(',');
+                let resKorlap = await fetch(`${SUPABASE_URL}/konekta_admins?or=(${filter})&select=*`, { headers: headersSupa });
                 let dataKorlap = await resKorlap.json();
-                
+
                 if (dataKorlap.length > 0) {
                     if (dataKorlap[0].password === p) {
-                        let roleType = dataKorlap[0].role === 'supergm' ? 'super_gm' : 'gm';
-                        localStorage.setItem('ms_role', roleType); 
-                        localStorage.setItem('ms_admin_id', u); 
+                        const roleDb = String(dataKorlap[0].role || 'gm').toLowerCase();
+                        let roleType = (roleDb === 'supergm' || roleDb === 'super_gm') ? 'super_gm' : 'gm';
+                        localStorage.setItem('ms_role', roleType);
+                        localStorage.setItem('ms_admin_id', dataKorlap[0].name);
                         localStorage.setItem('ms_admin_name', dataKorlap[0].name);
                         localStorage.setItem('ms_admin_wa', dataKorlap[0].wa);
                         window.location.href = "gm.html";
                     } else {
-                        Swal.fire("Ditolak", "Password salah!", "error");
+                        Swal.fire("Ditolak", `Password salah untuk akun ${dataKorlap[0].name}.`, "error");
                     }
                 } else {
-                    Swal.fire("Ditolak", "Username tidak ditemukan di database!", "error");
+                    Swal.fire("Ditolak", "Akun tidak ditemukan. Pakai nomor WhatsApp yang terdaftar atau nama akun admin.", "error");
                 }
             } catch (e) {
                 Swal.fire("Error", "Gagal menghubungi server.", "error");
