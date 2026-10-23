@@ -35,66 +35,66 @@
                 <img src="logo.png" alt="Logo" class="w-12 h-auto object-contain" onerror="this.style.display='none'">
                 <div>
                     <h2 class="text-2xl font-black uppercase text-[#0f766e] tracking-tighter text-left">KONEKTA</h2>
-                    <p id="admin-greeting" class="text-[9px] font-bold text-gray-400 uppercase tracking-widest text-left">Console Admin</p>
+                    <p id="admin-greeting" class="text-[11px] font-bold text-gray-600 uppercase tracking-widest text-left">Console Admin</p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <a href="https://lebahbergerak.fun/dashboard.html" class="bg-teal-50 text-[#0f766e] px-4 py-2 rounded-full text-[10px] font-black uppercase hover:bg-teal-100 transition-colors no-underline">Dashboard</a>
-                <button onclick="logout()" class="bg-red-50 text-red-500 px-4 py-2 rounded-full text-[10px] font-black uppercase hover:bg-red-100 transition-colors">Keluar</button>
+                <a href="https://lebahbergerak.fun/dashboard.html" class="bg-teal-50 text-[#0f766e] px-4 py-2 rounded-full text-[11px] font-black uppercase hover:bg-teal-100 transition-colors no-underline">Dashboard</a>
+                <button onclick="logout()" class="bg-red-50 text-red-700 px-4 py-2 rounded-full text-[11px] font-black uppercase hover:bg-red-100 transition-colors">Keluar</button>
             </div>
         </div>
 
         <div id="super-stats" class="hidden grid grid-cols-1 mb-6 text-center">
             <div class="bg-super text-white p-6 rounded-[2rem] shadow-xl relative overflow-hidden">
-                <p class="text-[10px] font-black uppercase tracking-[0.2em] opacity-60 text-center mb-2">Total Populasi</p>
+                <p class="text-[11px] font-black uppercase tracking-[0.2em] opacity-85 text-center mb-2">Total Populasi</p>
                 <h3 id="total-members" class="text-5xl font-black mt-1 text-center tracking-tighter">0</h3>
-                <p class="text-[10px] opacity-40 uppercase mt-1">Konektor Terdaftar</p>
+                <p class="text-[11px] opacity-80 uppercase mt-1">Konektor Terdaftar</p>
                 <div class="flex gap-2 mt-6">
-                    <button onclick="openRegionStats()" id="btn-view-regions" class="flex-1 bg-teal-800 text-white py-3 rounded-xl text-[10px] font-black uppercase active:scale-95 hover:bg-teal-900 transition-all border border-teal-700">Lihat Wilayah</button>
-                    <button class="flex-1 bg-white/10 border border-white/10 text-white py-3 rounded-xl text-[10px] font-black uppercase opacity-50 cursor-not-allowed">Download .CSV</button>
+                    <button onclick="openRegionStats()" id="btn-view-regions" class="flex-1 bg-teal-800 text-white py-3 rounded-xl text-[11px] font-black uppercase active:scale-95 hover:bg-teal-900 transition-all border border-teal-700">Lihat Wilayah</button>
+                    <button class="flex-1 bg-white/10 border border-white/15 text-white py-3 rounded-xl text-[11px] font-black uppercase opacity-85 cursor-not-allowed">Download .CSV</button>
                 </div>
             </div>
         </div>
 
         <div class="flex bg-white rounded-full p-1.5 mb-6 shadow-sm border border-green-50 text-center">
-            <button id="nav-gm-event" onclick="showGMSection('event')" class="flex-1 py-3 rounded-full text-[10px] font-black bg-[#0f766e] text-white uppercase text-center tracking-wide transition-all">Event</button>
-            <button id="nav-gm-orders" onclick="showGMSection('orders')" class="flex-1 py-3 rounded-full text-[10px] font-black text-gray-400 uppercase text-center tracking-wide transition-all">Pencairan</button>
-            <button id="nav-gm-korlap" onclick="showGMSection('korlap')" class="hidden flex-1 py-3 rounded-full text-[10px] font-black text-gray-400 uppercase text-center tracking-wide transition-all border-l border-gray-100">Korlap</button>
+            <button id="nav-gm-event" onclick="showGMSection('event')" class="flex-1 py-3 rounded-full text-[11px] font-black bg-[#0f766e] text-white uppercase text-center tracking-wide transition-all">Event</button>
+            <button id="nav-gm-orders" onclick="showGMSection('orders')" class="flex-1 py-3 rounded-full text-[11px] font-black text-gray-600 uppercase text-center tracking-wide transition-all">Pencairan</button>
+            <button id="nav-gm-korlap" onclick="showGMSection('korlap')" class="hidden flex-1 py-3 rounded-full text-[11px] font-black text-gray-600 uppercase text-center tracking-wide transition-all border-l border-gray-100">Korlap</button>
         </div>
 
         <div id="gm-section-event">
             
             <div id="gm-event-selector" class="mb-6 space-y-4">
-                <h3 class="text-[10px] font-black uppercase text-gray-400 tracking-widest text-center border-b border-gray-100 pb-2">Lokasi Aktif Hari Ini</h3>
+                <h3 class="text-[11px] font-black uppercase text-gray-600 tracking-widest text-center border-b border-gray-100 pb-2">Lokasi Aktif Hari Ini</h3>
                 <div id="active-locations-list" class="space-y-3">
-                    <p class="text-[10px] text-gray-400 italic">Memuat data...</p>
+                    <p class="text-[11px] text-gray-600 italic">Memuat data...</p>
                 </div>
                 
-                <button id="btn-view-archive" onclick="loadEventHistory()" class="hidden w-full py-4 bg-gray-100 border border-gray-200 rounded-3xl text-[10px] font-black text-gray-500 uppercase active:scale-95 transition-all text-center shadow-sm hover:bg-gray-200 mt-2">📂 Arsip Event Selesai</button>
-                <button onclick="toggleEventForm()" class="w-full py-5 bg-white border-2 border-dashed border-teal-200 rounded-3xl text-[11px] font-black text-teal-600 uppercase active:scale-95 transition-all text-center shadow-sm hover:bg-teal-50 group mt-3">
+                <button id="btn-view-archive" onclick="loadEventHistory()" class="hidden w-full py-4 bg-white border-2 border-dashed border-gray-400 rounded-3xl text-[11px] font-black text-gray-800 uppercase active:scale-95 transition-all text-center shadow-sm hover:bg-gray-200 mt-2">📂 Arsip Event Selesai</button>
+                <button onclick="toggleEventForm()" class="w-full py-5 bg-white border-2 border-dashed border-teal-200 rounded-3xl text-[11px] font-black text-teal-700 uppercase active:scale-95 transition-all text-center shadow-sm hover:bg-teal-50 group mt-3">
                     <span class="group-hover:scale-110 inline-block transition-transform mr-1">+</span> Buat Event Baru
                 </button>
             </div>
 
             <div id="gm-archive-list" class="hidden mb-6 space-y-4">
                 <div class="flex justify-between items-center border-b border-gray-100 pb-2">
-                    <h3 class="text-[10px] font-black uppercase text-gray-400 tracking-widest">Riwayat Event (Selesai)</h3>
-                    <button onclick="closeArchive()" class="text-xs font-bold text-red-500 hover:text-red-700">Tutup Arsip</button>
+                    <h3 class="text-[11px] font-black uppercase text-gray-600 tracking-widest">Riwayat Event (Selesai)</h3>
+                    <button onclick="closeArchive()" class="text-xs font-bold text-red-700 hover:text-red-700">Tutup Arsip</button>
                 </div>
                 <div id="archive-items" class="space-y-3"></div>
             </div>
 
             <div id="gm-create-event" class="hidden bg-white p-8 rounded-[3rem] shadow-2xl border border-green-100 space-y-4 relative">
-                <button onclick="toggleEventForm()" class="absolute top-6 right-6 text-gray-300 hover:text-red-500 font-bold text-xl transition-colors">✕</button>
+                <button onclick="toggleEventForm()" class="absolute top-6 right-6 text-gray-600 hover:text-red-700 font-bold text-xl transition-colors">✕</button>
                 <h3 class="text-center font-black uppercase text-lg text-gray-800 tracking-tight mb-4">Setup Lokasi</h3>
                 
                 <input type="text" id="ev-name" placeholder="Nama Kegiatan (Contoh: Kopi Darat)" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none font-bold text-sm focus:border-primary transition-all">
-                <div class="w-full text-left ml-2 mb-1 mt-2"><label class="text-[9px] font-black text-teal-600 uppercase tracking-widest">Tanggal Pelaksanaan</label></div>
+                <div class="w-full text-left ml-2 mb-1 mt-2"><label class="text-[11px] font-black text-teal-700 uppercase tracking-widest">Tanggal Pelaksanaan</label></div>
                 <input type="date" id="ev-date" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none font-bold text-gray-700 text-center focus:border-primary transition-all cursor-pointer">
                 <input type="text" id="ev-loc" placeholder="Lokasi (Contoh: Zona A)" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none font-bold text-sm focus:border-primary transition-all">
                 
                 <div class="bg-gray-50 p-4 rounded-2xl border border-gray-200 mt-2 text-left">
-                    <p class="text-[8px] font-black text-gray-400 uppercase tracking-widest">Penanggung Jawab:</p>
+                    <p class="text-[11px] font-black text-gray-600 uppercase tracking-widest">Penanggung Jawab:</p>
                     <p id="creator-display-name" class="text-xs font-bold text-teal-700 mt-0.5">Memuat...</p>
                 </div>
                 
@@ -104,7 +104,7 @@
                         <option value="5" selected>5 Poin (Rp 5.000)</option>
                         <option value="10">10 Poin (Rp 10.000)</option>
                     </select>
-                    <select id="ev-cooldown" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-red-100 outline-none font-black text-red-500 text-center text-xs">
+                    <select id="ev-cooldown" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-red-100 outline-none font-black text-red-700 text-center text-xs">
                         <option value="15">Jeda 15 Mnt</option>
                         <option value="30">Jeda 30 Mnt</option>
                         <option value="60" selected>Jeda 60 Mnt</option>
@@ -112,31 +112,31 @@
                 </div>
                 
                 <button id="btn-submit-event" onclick="buatEventBaru()" class="w-full bg-gradient-to-r from-teal-600 to-emerald-600 text-white py-5 rounded-2xl font-black shadow-lg uppercase text-xs active:scale-95 text-center tracking-widest mt-2">AKTIFKAN SEKARANG</button>
-                <p class="text-[8px] text-gray-400 text-center font-bold mt-2 italic">*Event akan otomatis ditutup dalam 3 jam.</p>
+                <p class="text-[11px] text-gray-600 text-center font-bold mt-2 italic">*Event akan otomatis ditutup dalam 3 jam.</p>
             </div>
 
             <div id="gm-active-display" class="hidden bg-white p-8 rounded-[3rem] shadow-2xl border-4 border-teal-500 text-center relative overflow-hidden">
                 <div class="absolute top-0 left-0 w-full h-2 bg-teal-500 animate-pulse"></div>
                 <h2 id="display-ev-name" class="text-3xl font-black italic text-gray-800 uppercase leading-tight text-center mb-1"></h2>
-                <p id="display-ev-info" class="text-[10px] font-bold text-teal-600 mt-1 uppercase tracking-widest text-center bg-teal-50 inline-block px-3 py-1 rounded-full"></p>
-                <p id="display-ev-creator" class="text-[9px] text-gray-400 mt-2 font-black uppercase tracking-widest"></p>
+                <p id="display-ev-info" class="text-[11px] font-bold text-teal-700 mt-1 uppercase tracking-widest text-center bg-teal-50 inline-block px-3 py-1 rounded-full"></p>
+                <p id="display-ev-creator" class="text-[11px] text-gray-600 mt-2 font-black uppercase tracking-widest"></p>
                 
                 <div class="my-8 flex justify-center p-4 bg-white rounded-[2rem] shadow-inner border border-gray-100">
                     <div id="ev-qrcode-area"></div>
                 </div>
                 
-                <p class="text-[10px] text-gray-400 mb-4 italic font-bold">Konektor Scan QR di atas, ATAU</p>
+                <p class="text-[11px] text-gray-600 mb-4 italic font-bold">Konektor Scan QR di atas, ATAU</p>
                 
                 <button onclick="openGMScannerMode()" class="w-full bg-gray-900 text-white py-4 rounded-2xl font-black uppercase shadow-lg mb-2 flex justify-center items-center gap-3 active:scale-95 hover:bg-gray-800 transition-colors">
-                    <span class="text-xl">📷</span> <span class="text-[10px] tracking-widest">Scan QR NIK Konektor</span>
+                    <span class="text-xl">📷</span> <span class="text-[11px] tracking-widest">Scan QR NIK Konektor</span>
                 </button>
                 <button id="btn-view-attendees" onclick="openAttendeeList()" class="w-full bg-teal-50 text-teal-700 border border-teal-100 py-3 rounded-2xl font-black uppercase shadow-sm mb-4 flex justify-center items-center gap-2 active:scale-95 hover:bg-teal-100 transition-colors">
-                    <span class="text-lg">👥</span> <span class="text-[10px] tracking-widest">Lihat Data Peserta</span>
+                    <span class="text-lg">👥</span> <span class="text-[11px] tracking-widest">Lihat Data Peserta</span>
                 </button>
                 
                 <div class="flex gap-2">
-                    <button onclick="closeEventView()" class="flex-1 bg-gray-100 py-3 rounded-xl text-[9px] font-black uppercase active:scale-95 text-gray-500 hover:bg-gray-200">Kembali</button>
-                    <button id="btn-end-event" class="flex-1 bg-red-50 text-red-500 py-3 rounded-xl text-[9px] font-black uppercase active:scale-95 hover:bg-red-100">Event Selesai</button>
+                    <button onclick="closeEventView()" class="flex-1 bg-gray-100 py-3 rounded-xl text-[11px] font-black uppercase active:scale-95 text-gray-600 hover:bg-gray-200">Kembali</button>
+                    <button id="btn-end-event" class="flex-1 bg-red-50 text-red-700 py-3 rounded-xl text-[11px] font-black uppercase active:scale-95 hover:bg-red-100">Event Selesai</button>
                 </div>
             </div>
         </div>
@@ -148,7 +148,7 @@
         <div id="gm-section-korlap" class="hidden space-y-4">
             <div class="bg-white p-6 rounded-[2.5rem] shadow-xl border border-green-100 text-left">
                 <h3 class="text-center font-black uppercase text-lg text-gray-800 tracking-tight mb-2">Daftarkan Korlap Baru</h3>
-                <p class="text-[9px] text-gray-400 text-center uppercase tracking-widest mb-6">Beri Akses GM Untuk Pimpinan Wilayah</p>
+                <p class="text-[11px] text-gray-600 text-center uppercase tracking-widest mb-6">Beri Akses GM Untuk Pimpinan Wilayah</p>
                 
                 <div class="space-y-3">
                     <input type="text" id="korlap-user" placeholder="Buat Username (Contoh: korlap_gubeng)" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none font-bold text-sm focus:border-[#0f766e] transition-all">
@@ -167,13 +167,13 @@
             <div class="p-6 pb-2 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
                 <div>
                     <h2 class="text-lg font-black text-[#0f766e] uppercase">Data Kehadiran</h2>
-                    <p id="attendee-count" class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">0 Peserta</p>
+                    <p id="attendee-count" class="text-[11px] font-bold text-gray-600 uppercase tracking-widest">0 Peserta</p>
                 </div>
-                <button onclick="closeAttendeeList()" class="bg-gray-200 w-8 h-8 rounded-full flex items-center justify-center text-gray-500 font-bold hover:bg-red-100 hover:text-red-500 transition-all">✕</button>
+                <button onclick="closeAttendeeList()" class="bg-gray-200 w-8 h-8 rounded-full flex items-center justify-center text-gray-600 font-bold hover:bg-red-100 hover:text-red-700 transition-all">✕</button>
             </div>
             <div class="p-0 overflow-y-auto flex-1 bg-white">
                 <table class="w-full text-left">
-                    <thead class="bg-teal-50 text-teal-800 text-[9px] uppercase font-black tracking-wider sticky top-0">
+                    <thead class="bg-teal-50 text-teal-800 text-[11px] uppercase font-black tracking-wider sticky top-0">
                         <tr><th class="p-4 border-b border-teal-100">Nama / NIK</th><th class="p-4 border-b border-teal-100 text-right">Waktu</th></tr>
                     </thead>
                     <tbody id="attendee-list-body" class="text-xs font-bold text-gray-600"></tbody>
@@ -197,13 +197,13 @@
             <div class="p-6 pb-2 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
                 <div>
                     <h2 class="text-lg font-black text-[#0f766e] uppercase">Statistik Wilayah</h2>
-                    <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Sebaran Konektor</p>
+                    <p class="text-[11px] font-bold text-gray-600 uppercase tracking-widest">Sebaran Konektor</p>
                 </div>
-                <button onclick="closeRegionStats()" class="bg-gray-200 w-8 h-8 rounded-full flex items-center justify-center text-gray-500 font-bold hover:bg-red-100 hover:text-red-500 transition-all">✕</button>
+                <button onclick="closeRegionStats()" class="bg-gray-200 w-8 h-8 rounded-full flex items-center justify-center text-gray-600 font-bold hover:bg-red-100 hover:text-red-700 transition-all">✕</button>
             </div>
             <div class="p-0 overflow-y-auto flex-1 bg-white">
                 <table class="w-full text-left">
-                    <thead class="bg-teal-50 text-teal-800 text-[9px] uppercase font-black tracking-wider sticky top-0">
+                    <thead class="bg-teal-50 text-teal-800 text-[11px] uppercase font-black tracking-wider sticky top-0">
                         <tr><th class="p-4 border-b border-teal-100">Kecamatan / Kelurahan</th><th class="p-4 border-b border-teal-100 text-center">Total</th></tr>
                     </thead>
                     <tbody id="region-table-body" class="text-xs font-bold text-gray-600"></tbody>
@@ -292,11 +292,11 @@
             document.getElementById('gm-section-orders').classList.toggle('hidden', s !== 'orders');
             document.getElementById('gm-section-korlap').classList.toggle('hidden', s !== 'korlap');
             
-            document.getElementById('nav-gm-event').className = s === 'event' ? "flex-1 py-3 rounded-full text-[10px] font-black bg-[#0f766e] text-white uppercase tracking-wide transition-all" : "flex-1 py-3 rounded-full text-[10px] font-black text-gray-400 uppercase tracking-wide transition-all";
-            document.getElementById('nav-gm-orders').className = s === 'orders' ? "flex-1 py-3 rounded-full text-[10px] font-black bg-[#0f766e] text-white uppercase tracking-wide transition-all" : "flex-1 py-3 rounded-full text-[10px] font-black text-gray-400 uppercase tracking-wide transition-all";
+            document.getElementById('nav-gm-event').className = s === 'event' ? "flex-1 py-3 rounded-full text-[11px] font-black bg-[#0f766e] text-white uppercase tracking-wide transition-all" : "flex-1 py-3 rounded-full text-[11px] font-black text-gray-600 uppercase tracking-wide transition-all";
+            document.getElementById('nav-gm-orders').className = s === 'orders' ? "flex-1 py-3 rounded-full text-[11px] font-black bg-[#0f766e] text-white uppercase tracking-wide transition-all" : "flex-1 py-3 rounded-full text-[11px] font-black text-gray-600 uppercase tracking-wide transition-all";
             
             if(role === 'super_gm') {
-                document.getElementById('nav-gm-korlap').className = s === 'korlap' ? "flex-1 py-3 rounded-full text-[10px] font-black bg-[#0f766e] text-white uppercase tracking-wide transition-all border-l border-gray-100" : "flex-1 py-3 rounded-full text-[10px] font-black text-gray-400 uppercase tracking-wide transition-all border-l border-gray-100";
+                document.getElementById('nav-gm-korlap').className = s === 'korlap' ? "flex-1 py-3 rounded-full text-[11px] font-black bg-[#0f766e] text-white uppercase tracking-wide transition-all border-l border-gray-100" : "flex-1 py-3 rounded-full text-[11px] font-black text-gray-600 uppercase tracking-wide transition-all border-l border-gray-100";
             }
             
             if(s === 'orders') loadRedeemOrders();
@@ -389,7 +389,7 @@
                 const data = await res.json();
                 
                 const list = document.getElementById('active-locations-list');
-                list.innerHTML = data.length === 0 ? '<p class="text-center py-8 text-[10px] text-gray-300 font-bold uppercase tracking-widest border-2 border-dashed border-gray-200 rounded-3xl">Tidak ada lokasi aktif</p>' : '';
+                list.innerHTML = data.length === 0 ? '<p class="text-center py-8 text-[11px] text-gray-600 font-bold uppercase tracking-widest border-2 border-dashed border-gray-200 rounded-3xl">Tidak ada lokasi aktif</p>' : '';
                 
                 data.forEach(async (ev) => {
                     if (ev.created_at && (Date.now() - ev.created_at > 10800000)) {
@@ -398,17 +398,17 @@
                     }
 
                     const waLink = `https://wa.me/${ev.creator_wa}?text=${encodeURIComponent(`Konfirmasi Event: ${ev.name} di ${ev.location}`)}`;
-                    let auditHTML = role === 'super_gm' ? `<a href="${waLink}" target="_blank" onclick="event.stopPropagation()" class="block w-full text-center bg-red-50 text-red-600 font-black text-[10px] uppercase py-2 rounded-xl mt-3 border border-red-100 hover:bg-red-100 transition-colors">👮 Konfirmasi / Audit GM</a>` : '';
+                    let auditHTML = role === 'super_gm' ? `<a href="${waLink}" target="_blank" onclick="event.stopPropagation()" class="block w-full text-center bg-red-50 text-red-700 font-black text-[11px] uppercase py-2 rounded-xl mt-3 border border-red-100 hover:bg-red-100 transition-colors">👮 Konfirmasi / Audit GM</a>` : '';
 
                     list.innerHTML += `
                     <div class="w-full bg-white p-5 rounded-3xl border border-gray-100 shadow-sm mb-3 hover:shadow-md transition-shadow">
                         <div class="flex justify-between items-center cursor-pointer" onclick="selectLocation('${ev.id}')">
                             <div class="text-left">
                                 <p class="text-[12px] font-black uppercase text-teal-700">${ev.location}</p>
-                                <p class="text-[10px] font-bold text-gray-400 uppercase">${ev.name}</p>
-                                <p class="text-[8px] font-bold text-teal-500 uppercase mt-1">PJ: ${ev.creator}</p>
+                                <p class="text-[11px] font-bold text-gray-600 uppercase">${ev.name}</p>
+                                <p class="text-[11px] font-bold text-teal-700 uppercase mt-1">PJ: ${ev.creator}</p>
                             </div>
-                            <span class="bg-teal-50 text-teal-600 text-[9px] px-4 py-2 rounded-full font-black uppercase border border-teal-100">Buka</span>
+                            <span class="bg-teal-50 text-teal-700 text-[11px] px-4 py-2 rounded-full font-black uppercase border border-teal-100">Buka</span>
                         </div>
                         ${auditHTML}
                     </div>`;
@@ -439,7 +439,7 @@
                     const btnEnd = document.getElementById('btn-end-event');
                     if(role === 'super_gm') {
                         btnEnd.innerText = "HAPUS & TARIK POIN"; 
-                        btnEnd.className = "flex-1 bg-red-600 text-white py-3 rounded-xl text-[9px] font-black uppercase active:scale-95 shadow-md";
+                        btnEnd.className = "flex-1 bg-red-600 text-white py-3 rounded-xl text-[11px] font-black uppercase active:scale-95 shadow-md";
                         btnEnd.onclick = deleteAndRevokeEvent;
                     } else {
                         btnEnd.innerText = "Event Selesai"; 
@@ -497,7 +497,7 @@
 
         window.loadEventHistory = async () => {
             const list = document.getElementById('archive-items'); 
-            list.innerHTML = "<p class='text-center py-4 text-[10px] text-gray-400'>Memuat data...</p>";
+            list.innerHTML = "<p class='text-center py-4 text-[11px] text-gray-600'>Memuat data...</p>";
             document.getElementById('gm-archive-list').classList.remove('hidden'); 
             document.getElementById('active-locations-list').classList.add('hidden');
             
@@ -509,23 +509,23 @@
                 const data = await res.json();
                 
                 if (data.length === 0) {
-                    list.innerHTML = '<p class="text-center py-4 text-[10px] text-gray-400 italic">Belum ada event selesai.</p>';
+                    list.innerHTML = '<p class="text-center py-4 text-[11px] text-gray-600 italic">Belum ada event selesai.</p>';
                     return;
                 }
                 
                 list.innerHTML = '';
                 data.forEach(ev => {
-                    let auditBtn = ev.creator_wa ? `<a href="https://wa.me/${ev.creator_wa}?text=Audit%20Event%20${encodeURIComponent(ev.name)}" target="_blank" class="block text-center mt-2 text-[8px] font-black text-red-500 uppercase hover:underline">👮 Audit WA</a>` : '';
+                    let auditBtn = ev.creator_wa ? `<a href="https://wa.me/${ev.creator_wa}?text=Audit%20Event%20${encodeURIComponent(ev.name)}" target="_blank" class="block text-center mt-2 text-[11px] font-black text-red-700 uppercase hover:underline">👮 Audit WA</a>` : '';
                     
                     list.innerHTML += `
                     <div class="w-full bg-gray-50 p-4 rounded-2xl border border-gray-200 mb-2 hover:bg-gray-100 transition-colors">
                         <div class="flex justify-between items-center cursor-pointer" onclick="selectLocation('${ev.id}')">
                             <div class="text-left">
-                                <p class="text-[10px] font-black text-gray-600 line-through decoration-red-500">${ev.name}</p>
-                                <p class="text-[8px] text-gray-400">${ev.date} • ${ev.location}</p>
-                                <p class="text-[8px] font-bold text-teal-600">PJ: ${ev.creator}</p>
+                                <p class="text-[11px] font-black text-gray-600 line-through decoration-red-500">${ev.name}</p>
+                                <p class="text-[11px] text-gray-600">${ev.date} • ${ev.location}</p>
+                                <p class="text-[11px] font-bold text-teal-700">PJ: ${ev.creator}</p>
                             </div>
-                            <span class="text-[9px] font-bold text-red-400 border border-red-200 px-2 py-1 rounded-lg">SELESAI</span>
+                            <span class="text-[11px] font-bold text-red-400 border border-red-200 px-2 py-1 rounded-lg">SELESAI</span>
                         </div>
                         ${auditBtn}
                     </div>`;
@@ -549,7 +549,7 @@
                 document.getElementById('attendee-count').innerText = `${data.length} Peserta`;
                 
                 if (data.length === 0) { 
-                    tbody.innerHTML = `<tr><td colspan="2" class="p-6 text-center text-gray-400 italic text-[10px]">Belum ada yang absen.</td></tr>`; 
+                    tbody.innerHTML = `<tr><td colspan="2" class="p-6 text-center text-gray-600 italic text-[11px]">Belum ada yang absen.</td></tr>`; 
                 } else {
                     currentAttendeeData = data.map(d => ({ 
                         name: d.user_name || "N/A", 
@@ -560,8 +560,8 @@
                     currentAttendeeData.forEach(p => { 
                         tbody.innerHTML += `
                         <tr class="border-b border-gray-100 hover:bg-gray-50">
-                            <td class="p-4"><div class="font-black text-teal-800 uppercase">${p.name}</div><div class="text-[9px] text-gray-400 font-mono">${p.nik}</div></td>
-                            <td class="p-4 text-right text-gray-500 font-medium">${p.fullTime.split(',')[1] || '-'}</td>
+                            <td class="p-4"><div class="font-black text-teal-800 uppercase">${p.name}</div><div class="text-[11px] text-gray-600 font-mono">${p.nik}</div></td>
+                            <td class="p-4 text-right text-gray-600 font-medium">${p.fullTime.split(',')[1] || '-'}</td>
                         </tr>`; 
                     });
                 }
@@ -620,7 +620,7 @@
                 tbody.innerHTML = "";
                 
                 if (sortedRegions.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="2" class="p-4 text-center text-gray-400 italic text-[10px]">Data relawan kosong.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="2" class="p-4 text-center text-gray-600 italic text-[11px]">Data relawan kosong.</td></tr>`;
                 } else {
                     sortedRegions.forEach(([region, count], index) => {
                         const isTop = index < 3 ? 'bg-yellow-50 text-yellow-800' : 'even:bg-gray-50';
@@ -705,9 +705,9 @@
                 
                 if (dataList.length === 0) {
                     list.innerHTML = `
-                    <div class="flex flex-col items-center justify-center py-10 text-gray-400">
+                    <div class="flex flex-col items-center justify-center py-10 text-gray-600">
                         <span class="text-3xl mb-2">☕</span>
-                        <p class="font-bold text-[10px] uppercase tracking-widest border border-dashed border-gray-200 px-6 py-3 rounded-2xl">Antrean Kosong</p>
+                        <p class="font-bold text-[11px] uppercase tracking-widest border border-dashed border-gray-200 px-6 py-3 rounded-2xl">Antrean Kosong</p>
                     </div>`;
                     return;
                 }
@@ -721,11 +721,11 @@
                     list.innerHTML += `
                     <div class="bg-white p-5 rounded-3xl border border-gray-100 mb-3 shadow-sm hover:shadow-md transition-shadow text-left">
                         <p class="text-[11px] font-black uppercase text-teal-700">${o.user_name}</p>
-                        <p class="text-[10px] text-gray-500 font-bold mt-1">${o.item_name}</p>
-                        <div class="bg-gray-50 p-3 rounded-xl text-[10px] italic my-3 text-gray-600 border border-gray-200">${o.target_info}</div>
+                        <p class="text-[11px] text-gray-600 font-bold mt-1">${o.item_name}</p>
+                        <div class="bg-gray-50 p-3 rounded-xl text-[11px] italic my-3 text-gray-600 border border-gray-200">${o.target_info}</div>
                         <div class="flex gap-2">
-                            <a href="${wa}" target="_blank" class="flex-1 bg-emerald-50 text-emerald-600 py-3 rounded-xl text-[9px] font-black uppercase border border-emerald-100 block text-center hover:bg-emerald-100 transition-colors">Chat WA</a>
-                            <button onclick="completeOrder('${o.id}')" class="flex-1 bg-gray-800 text-white py-3 rounded-xl text-[9px] font-black uppercase shadow-md active:scale-95 hover:bg-gray-900 transition-colors">Tandai Selesai</button>
+                            <a href="${wa}" target="_blank" class="flex-1 bg-emerald-50 text-emerald-700 py-3 rounded-xl text-[11px] font-black uppercase border border-emerald-100 block text-center hover:bg-emerald-100 transition-colors">Chat WA</a>
+                            <button onclick="completeOrder('${o.id}')" class="flex-1 bg-gray-800 text-white py-3 rounded-xl text-[11px] font-black uppercase shadow-md active:scale-95 hover:bg-gray-900 transition-colors">Tandai Selesai</button>
                         </div>
                     </div>`;
                 });
@@ -780,16 +780,16 @@
                     html: `
                         <p class="text-sm text-gray-600 mb-4">Akses Panglima Lapangan berhasil dibuat.</p>
                         <div class="bg-gray-50 p-4 rounded-2xl border border-gray-200 text-left shadow-inner">
-                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">NAMA KORLAP</p>
+                            <p class="text-[11px] font-bold text-gray-600 uppercase tracking-widest">NAMA KORLAP</p>
                             <p class="text-sm font-black text-teal-800 uppercase mb-3">${n}</p>
                             
-                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">USERNAME LOGIN</p>
+                            <p class="text-[11px] font-bold text-gray-600 uppercase tracking-widest">USERNAME LOGIN</p>
                             <p class="text-lg font-mono font-black text-gray-900 bg-white px-3 py-2 rounded-xl border border-gray-200 mb-3 select-all">${u}</p>
                             
-                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">PASSWORD LOGIN</p>
-                            <p class="text-lg font-mono font-black text-red-600 bg-red-50 px-3 py-2 rounded-xl border border-red-100 select-all">${p}</p>
+                            <p class="text-[11px] font-bold text-gray-600 uppercase tracking-widest">PASSWORD LOGIN</p>
+                            <p class="text-lg font-mono font-black text-red-700 bg-red-50 px-3 py-2 rounded-xl border border-red-100 select-all">${p}</p>
                         </div>
-                        <p class="text-[10px] text-gray-400 italic mt-4 font-bold">*Silakan Screenshot halaman ini dan berikan ke Korlap bersangkutan.</p>
+                        <p class="text-[11px] text-gray-600 italic mt-4 font-bold">*Silakan Screenshot halaman ini dan berikan ke Korlap bersangkutan.</p>
                     `,
                     icon: 'success',
                     confirmButtonColor: '#0f766e',

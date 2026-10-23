@@ -1,4 +1,4 @@
-const CACHE_NAME = 'konekta-v2'; // Versi dinaikkan untuk memaksa browser membuang cache lama
+const CACHE_NAME = 'konekta-v3'; // Versi dinaikkan untuk memaksa browser membuang cache lama
 const urlsToCache = [
     './',
     './index.html',

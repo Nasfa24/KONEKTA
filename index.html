@@ -46,13 +46,13 @@
         <div class="mb-10 pt-4 flex flex-col items-center">
             <img src="logo.png" alt="Logo KONEKTA" class="w-24 h-auto mb-4 object-contain drop-shadow-sm" onerror="this.style.display='none'">
             <h1 class="text-5xl font-black text-[#0f766e] tracking-tighter mb-2">KONEKTA</h1>
-            <p class="text-gray-500 text-sm font-medium tracking-widest uppercase">Terhubung Lebih Dekat</p>
+            <p class="text-gray-600 text-sm font-medium tracking-widest uppercase">Terhubung Lebih Dekat</p>
         </div>
 
         <div class="bg-white p-6 rounded-[2.5rem] shadow-xl border border-green-100 text-left relative z-10">
             <div class="flex bg-gray-50 rounded-full p-1 mb-6 text-center">
                 <button id="btn-auth-member" onclick="toggleAuth('member')" class="flex-1 py-3 rounded-full text-[11px] font-black bg-white shadow-sm text-[#0f766e] uppercase tracking-wide transition-all">Konektor</button>
-                <button id="btn-auth-gm" onclick="toggleAuth('gm')" class="flex-1 py-3 rounded-full text-[11px] font-black text-gray-400 uppercase tracking-wide transition-all">Game Master</button>
+                <button id="btn-auth-gm" onclick="toggleAuth('gm')" class="flex-1 py-3 rounded-full text-[11px] font-black text-gray-600 uppercase tracking-wide transition-all">Game Master</button>
             </div>
 
             <div id="form-member">
@@ -61,19 +61,19 @@
                     <input type="text" inputmode="numeric" id="reg-nik" placeholder="NIK (16 Digit)" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 16)" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none focus:border-[#0f766e] focus:bg-white transition-all font-bold text-gray-700">
                     
                     <div class="relative w-full">
-                        <input type="text" id="reg-domicile-input" placeholder="Ketik Kecamatan / Kelurahan..." autocomplete="off" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none focus:border-[#0f766e] focus:bg-white transition-all font-bold text-gray-700 text-sm placeholder:font-normal placeholder:text-gray-400">
+                        <input type="text" id="reg-domicile-input" placeholder="Ketik Kecamatan / Kelurahan..." autocomplete="off" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none focus:border-[#0f766e] focus:bg-white transition-all font-bold text-gray-700 text-sm placeholder:font-normal placeholder:text-gray-600">
                         <div id="domicile-suggestions" class="suggestions-list"></div>
                     </div>
 
                     <input type="text" inputmode="numeric" id="reg-wa" placeholder="No. WhatsApp" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 outline-none focus:border-[#0f766e] focus:bg-white transition-all font-bold text-gray-700">
                     <button id="btn-daftar" onclick="prosesDaftar()" class="w-full bg-gradient-to-r from-teal-600 to-emerald-600 text-white py-4 rounded-2xl font-black uppercase text-xs active:scale-95 transition-all shadow-lg mt-2 tracking-widest">Gabung Jadi Konektor</button>
-                    <button onclick="toggleMemberView('login')" class="text-[#0f766e] text-[10px] font-black uppercase underline mt-4 block mx-auto italic text-center">Masuk dengan NIK</button>
+                    <button onclick="toggleMemberView('login')" class="text-[#0f766e] text-[11px] font-black uppercase underline mt-4 block mx-auto italic text-center">Masuk dengan NIK</button>
                 </div>
 
                 <div id="member-login-fields" class="hidden space-y-3 text-center">
                     <input type="text" inputmode="numeric" id="login-nik" placeholder="16 Digit NIK" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 16)" class="w-full p-5 bg-gray-50 rounded-2xl border-2 border-gray-200 focus:border-[#0f766e] focus:bg-white outline-none text-center font-black text-lg tracking-widest text-[#0f766e] transition-all">
                     <button onclick="restoreByNIK()" class="w-full bg-[#0f766e] text-white py-4 rounded-2xl font-black uppercase text-xs active:scale-95 shadow-lg transition-transform">Masuk Aplikasi</button>
-                    <button onclick="toggleMemberView('register')" class="text-gray-400 text-[10px] font-bold uppercase mt-4 block mx-auto italic text-center hover:text-gray-600">Kembali Mendaftar</button>
+                    <button onclick="toggleMemberView('register')" class="text-gray-600 text-[11px] font-bold uppercase mt-4 block mx-auto italic text-center hover:text-gray-600">Kembali Mendaftar</button>
                 </div>
             </div>
 
@@ -150,10 +150,10 @@
             
             if (t === 'member') {
                 btnMember.className = "flex-1 py-3 rounded-full text-[11px] font-black bg-white shadow-sm text-[#0f766e] uppercase tracking-wide transition-all";
-                btnGm.className = "flex-1 py-3 rounded-full text-[11px] font-black text-gray-400 uppercase tracking-wide transition-all";
+                btnGm.className = "flex-1 py-3 rounded-full text-[11px] font-black text-gray-600 uppercase tracking-wide transition-all";
             } else {
                 btnGm.className = "flex-1 py-3 rounded-full text-[11px] font-black bg-white shadow-sm text-[#0f766e] uppercase tracking-wide transition-all";
-                btnMember.className = "flex-1 py-3 rounded-full text-[11px] font-black text-gray-400 uppercase tracking-wide transition-all";
+                btnMember.className = "flex-1 py-3 rounded-full text-[11px] font-black text-gray-600 uppercase tracking-wide transition-all";
             }
         };
 
